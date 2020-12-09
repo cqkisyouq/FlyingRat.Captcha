@@ -61,7 +61,6 @@
                     curWidth = Math.max(curWidth, 0);
                 }
                 if (x == 0) xxpos = 0;
-                //console.debug(curWidth, data.width,width,index,i)
                 let item = image.cloneNode();
                 item.style.backgroundImage = "url(" + url + ")";
                 item.style.backgroundPositionX = -xxpos + "px";
@@ -75,12 +74,7 @@
             for (var i = 0; i < images.length; i++) {
                 div.appendChild(images[i]);
             }
-            if (data.y) {
-                bindControlSlider();
-            }
-            if (data.x) {
-                bindControlClick();
-            }
+            bindControl();
         };
         function drawImage(data) {
             let canvas = method.options.canvas, container = method.container;
@@ -116,16 +110,9 @@
                         curWidth = Math.max(curWidth, 0);
                     }
                     ctx.drawImage(image, xxpos, xy * height, curWidth, height, xpos, y * height, curWidth, height);
-                    //console.debug("x：", x, " y：", y, " xx：", xx, " xy：", xy, " index：", index, " xxpos：", xxpos, " xpos：", xpos, " wid：", curWithd);
                     xxpos += curWidth;
                 }
-
-                if (data.y) {
-                    bindControlSlider();
-                }
-                if (data.x) {
-                    bindControlClick();
-                }
+                bindControl();
             }
         };
         function moveDown(event) {
@@ -134,14 +121,6 @@
             method.options.isMove = true;
             window.onmouseup = moveUp;
             window.onmousemove = move;
-        };
-        function moveUp(event) {
-            if (!method.options.isMove) return;
-            if (method.options.validate) method.options.validate(parseInt(method.options.sliderImg.style.left), parseInt(method.options.sliderImg.style.top));
-            method.options.isMove = false;
-            if (method.options.slider) method.options.slider.style.left = 0;
-            if (method.options.sliderImg) method.options.sliderImg.style.left = 0;
-            if (method.options.sliderBackground) method.options.sliderBackground.style.width = 0;
         };
         function move(event) {
             if (!method.options.isMove) return;
@@ -155,6 +134,27 @@
             if (method.options.sliderImg) method.options.sliderImg.style.left = mx;
             if (method.options.sliderBackground) method.options.sliderBackground.style.width = mx;
         };
+        function moveUp(event) {
+            if (!method.options.isMove) return;
+            sliderPoint(parseInt(method.options.sliderImg.style.left),parseInt(method.options.sliderImg.style.top));
+            method.options.isMove = false;
+            if (method.options.slider) method.options.slider.style.left = 0;
+            if (method.options.sliderImg) method.options.sliderImg.style.left = 0;
+            if (method.options.sliderBackground) method.options.sliderBackground.style.width = 0;
+        };
+
+        function bindControl() {
+            switch (method.options.data.type) {
+                case 2:
+                    bindControlSlider();
+                    break;
+                case 3:
+                    bindControlClick();
+                    break;
+                default:
+                    break;
+            }
+        }
         function bindControlSlider() {
             let $slider = method.options.slider, gapImg = method.options.sliderImg;
             gapImg.src =method.options.data.isAction?method.options.data.gap + "?tk=" + method.options.data.tk:method.options.data.gap;
@@ -168,6 +168,10 @@
         };
         function bindControlClick() {
             method.options.imgRoot.onclick = clickPoint;
+        }
+
+        function sliderPoint(x,y) {
+            if (method.options.validate) method.options.validate(x,y);
         }
         function clickPoint(event) {
             if (method.options.validate) method.options.validate(event.layerX, event.layerY);
