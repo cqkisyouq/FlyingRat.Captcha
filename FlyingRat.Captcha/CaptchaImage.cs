@@ -8,6 +8,9 @@ namespace FlyingRat.Captcha
 {
     public class CaptchaImage
     {
+        public string Token { get; set; }
+        public string Name { get; set; }
+        public CaptchaType Type { get; set; }
         /// <summary>
         /// Splite column for the image with x
         /// </summary>
@@ -46,10 +49,10 @@ namespace FlyingRat.Captcha
         /// 
         /// </summary>
         public Image Gap { get; set; }
-        public CaptchaType Type { get; set; }
         public string Code { get; set; }
         public string Tips { get; set; }
-        public string Token { get; set; }
+        public int TipWidth { get; set; }
+        public int tipHeight { get; set; }
     }
 
     public enum CaptchaType

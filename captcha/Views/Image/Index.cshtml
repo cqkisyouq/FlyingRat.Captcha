@@ -10,28 +10,30 @@
     }
 </style>
 <script>
-    var length = [];
+    var length = [],reType=null;
     function validate(x, y) {
         if (length.length < this.data.x) {
             length.push({ x: x, y: y });
         }
         if (length.length == this.data.x) {
-            $.post(this.data.validate, { points: length, tk: this.data.tk }, function (data) {
+            $.post(this.data.validate, { points: length, tk: this.data.tk, type: reType}, function (data) {
                 console.debug("验证结果：",data);
             });
             length = [];
         }
     }
-    function LoadImage() {
-        var cap = new captcha(document.querySelector("#canvasCaptach"), { validate: validate});
-        var divCap = new captcha(document.querySelector("#divCaptach"), { validate: validate });
-        $.post('@Html.Raw(Url.Action("RandImage", new { row = 2, col =15 }))', null, function (data) {
+    function LoadImage(type) {
+        reType = type;
+        var cap = new captcha(document.querySelector("#canvasCaptach"), { url: "@Html.Raw(Url.Action("RandImage"))?type="+type+"&row=3&col=15"});
+        var divCap = new captcha(document.querySelector("#divCaptach"), { validate: validate});
+        cap.drawCaptcha();
+        $.get('@Html.Raw(Url.Action("RandImage"))', {type:type,row:2,col:15}, function (data) {
             var back = document.getElementById("background");
             back.src = data.isAction ? data.full + "?tk=" + data.tk + "&&t=" + new Date().getMilliseconds() : data.full;
             var back = document.getElementById("randBackground");
             back.src = data.isAction ? data.bgGap + "?tk=" + data.tk + "&&t=" + new Date().getMilliseconds() : data.bgGap;
             divCap.drawCaptcha(data);
-            cap.drawCaptcha(data);
+            //cap.drawCaptcha(data);
         })
     }
 </script>
@@ -40,35 +42,37 @@
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body style="margin:0px;padding:0px;">
-    <input type="button" onclick="LoadImage()" value="刷新图片" />
+    <input type="button" onclick="LoadImage('PointCaptcha')" value="点击验证" />
+    <input type="button" onclick="LoadImage('SliderCaptcha')" value="滑块验证" />
     <div style="display:flex;">
         <div class="captcha-container" id="divCaptach">
             <div class="captcha-control-image">
                 <div class="captcha-img"></div>
                 <img class="captcha-slider-img" />
             </div>
-            <div class="captcha-control-slider">
-                <div class="captcha-slider-bg"></div>
-                <div class="captcha-slider"><span class="fa fa-arrow-right"></span></div>
-                <div style="text-align:center">
+            <div class="captcha-control">
+                <div class="captcha-control-tips">
                     <span>向右拖动滑块填充拼图</span>
+                </div>
+                <div class="captcha-control-slider">
+                    <div class="captcha-slider-bg"></div>
+                    <div class="captcha-slider"><span class="fa fa-arrow-right"></span></div>
                 </div>
             </div>
         </div>
 
         <div class="captcha-container" id="canvasCaptach">
-            <div class="captcha-tips">
-                <span>按顺序选择：我的心中</span>
-            </div>
             <div class="captcha-control-image">
                 <canvas id="brush">请使用更高版本的浏览器</canvas>
                 <img class="captcha-slider-img" />
             </div>
-            <div class="captcha-control-slider">
-                <div class="captcha-slider-bg"></div>
-                <div class="captcha-slider"></div>
-                <div style="text-align:center">
+            <div class="captcha-control">
+                <div class="captcha-control-tips">
                     <span>向右拖动滑块填充拼图</span>
+                </div>
+                <div class="captcha-control-slider">
+                    <div class="captcha-slider-bg"></div>
+                    <div class="captcha-slider"></div>
                 </div>
             </div>
         </div>

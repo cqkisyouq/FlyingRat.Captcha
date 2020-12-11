@@ -18,5 +18,6 @@ namespace FlyingRat.Captcha.Interface
         Task<Image<Rgba32>> LoadSlider(string path);
         Task<Image<Rgba32>> LoadImage(string path);
         Task<List<Image<Rgba32>>> LoadImages(string directory);
+        Task<List<Image<Rgba32>>> LoadRandImages(string directory);
     }
 }

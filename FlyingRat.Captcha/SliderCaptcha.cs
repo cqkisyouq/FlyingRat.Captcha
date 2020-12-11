@@ -31,6 +31,7 @@ namespace FlyingRat.Captcha
             _captchaImageBuilder = builder;
         }
         public SliderCaptcha() { }
+        public override CaptchaType Type => CaptchaType.Slider;
         public override async ValueTask<CaptchaImage> CaptchaCreate(BaseCaptchaOptions options)
         {
             var path = _imageProvider.SliderRoot;
@@ -39,8 +40,9 @@ namespace FlyingRat.Captcha
             using var border = await _imageProvider.LoadBorder(path);
             using var slider = await _imageProvider.LoadSlider(path);
             var fullImage = image.Clone();
-            int col = options?.Col ?? _options.Col;
-            int row = options?.Row ?? _options.Row;
+            var option = options ?? _options;
+            int col = option.Col;
+            int row = option.Row;
             var point = RandPoint(image, alpha);
             _driver.CopyNoAlpha(image, new Point(point.X, point.Y), alpha);
 
@@ -62,7 +64,8 @@ namespace FlyingRat.Captcha
                 .AddIndex(randData.Select(x => x.Index).ToArray())
                 .AddChange(randData.Where(x => x.Change).Select(x => x.Index).ToArray())
                 .AddColumn(col).AddRow(row)
-                .AddType(CaptchaType.Slider)
+                .AddType(Type).AddName(Name)
+                .AddTips("向右拖动滑块填充拼图")
                 .AddPoints(new List<CaptchaPoint>(1) { point });
             return _captchaImageBuilder.Build();
         }

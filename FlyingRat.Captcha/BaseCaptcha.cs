@@ -12,6 +12,11 @@ namespace FlyingRat.Captcha
     public abstract class BaseCaptcha : ICaptcha
     {
         protected Random rd = new Random(DateTime.Now.Millisecond);
+
+        public string Name => this.GetType().Name;
+
+        public abstract CaptchaType Type { get; }
+
         public ValueTask<CaptchaImage> Captcha(BaseCaptchaOptions options = null)
         {
             return CaptchaCreate(options);
@@ -32,15 +37,15 @@ namespace FlyingRat.Captcha
 
         protected CaptchaPoint RandPoint(Image source, Image target)
         {
-            var x = rd.Next(target.Width, source.Width - target.Width);
-            var y = rd.Next(target.Height, source.Height - target.Height);
+            var x = rd.Next(target.Width, source.Width - (int)(target.Width * 1.5));
+            var y = rd.Next(target.Height, source.Height - (int)(target.Height * 1.5));
             return new CaptchaPoint(x, y, target.Width, target.Height);
         }
 
         protected CaptchaPoint RandPoint(Image source, Image target, List<CaptchaPoint> points)
         {
-            var maxWidth = source.Width - target.Width;
-            var maxHeight = source.Height - target.Height;
+            var maxWidth = source.Width - (int)(target.Width * 1.5);
+            var maxHeight = source.Height - (int)(target.Height * 1.5);
             var x = rd.Next(target.Width, maxWidth);
             var y = rd.Next(target.Height, maxHeight);
             var point = new CaptchaPoint(x, y, target.Width, target.Height);

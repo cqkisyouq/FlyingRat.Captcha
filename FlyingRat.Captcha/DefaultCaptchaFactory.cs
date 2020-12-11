@@ -12,7 +12,7 @@ namespace FlyingRat.Captcha
         public DefaultCaptchaFactory(IEnumerable<ICaptcha> captchas)
         {
             _handlers = captchas;
-            _validatorDic = _handlers.ToDictionary(x => x.GetType().Name, x => x);
+            _validatorDic = _handlers.ToDictionary(x =>x.Name, x => x);
         }
 
          public ICaptcha Create(string type)
@@ -23,7 +23,7 @@ namespace FlyingRat.Captcha
 
         ICaptcha ICaptchaFactory.Create<T>()
         {
-            var type = typeof(T).Name;
+            var type=_handlers.Where(x =>x.GetType()== typeof(T)).FirstOrDefault()?.Name;
             return Create(type);
         }
     }

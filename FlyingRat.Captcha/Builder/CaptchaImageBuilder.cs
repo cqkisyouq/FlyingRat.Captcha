@@ -63,6 +63,16 @@ namespace FlyingRat.Captcha.Builder
             Captcha.Value.Tips = tips;
             return this;
         }
+        public CaptchaImageBuilder AddTipWidth(int width)
+        {
+            Captcha.Value.TipWidth = width;
+            return this;
+        }
+        public CaptchaImageBuilder AddTipHeight(int height)
+        {
+            Captcha.Value.tipHeight = height;
+            return this;
+        }
         public CaptchaImageBuilder AddCode(string code)
         {
             Captcha.Value.Code = code;
@@ -73,6 +83,12 @@ namespace FlyingRat.Captcha.Builder
             Captcha.Value.Type = type;
             return this;
         }
+        public CaptchaImageBuilder AddName(string name)
+        {
+            Captcha.Value.Name = name;
+            return this;
+        }
+
 
         public CaptchaImageBuilder AddToken(string token)
         {

@@ -39,9 +39,9 @@ namespace Captcha.Controllers
         {
             return View();
         }
-        public async ValueTask<IActionResult> RandImage(int? row = 2, int? col = 13)
+        public async ValueTask<IActionResult> RandImage(string type= "SliderCatpcha", int? row = 2, int? col = 13)
         {
-            var captcha =await _captchaManager.Captcha<SliderCaptcha>(new SliderOptions() { Col=col.Value,Row=row.Value});
+            var captcha =await _captchaManager.Captcha(type, new BaseCaptchaOptions() { Col=col.Value,Row=row.Value});
             var model = captcha.ToViewModel(Url.Action("Validate"));
             //model.BgGap = Url.Action("SliderBackground");
             //model.Full = Url.Action("Background");
@@ -76,13 +76,13 @@ namespace Captcha.Controllers
             return File(ms.ToArray(), "image/png");
         }
 
-        public async ValueTask<IActionResult> Validate(ValidateModel model,string tk)
+        public async ValueTask<IActionResult> Validate(ValidateModel model,string tk,string type="SliderCatpcha")
         {
             var data = _memoryCache.Get<CaptchaCacheModel>(cacheKey + tk);
             if (data == null) return Json(ValidateResult.Failed);
-            var context = new CaptchaContext(new ValidateModel(data.Points), model);
-            var result =await _captchaManager.Validate<SliderCaptcha>(context);
-            return Json(result);
+            var context = new CaptchaContext(new ValidateModel(data.Points), model,data.Validate);
+            data.Validate =await _captchaManager.Validate(type, context);
+            return Json(data.Validate);
         }
     }
 }

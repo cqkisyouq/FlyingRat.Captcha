@@ -47,6 +47,7 @@ namespace FlyingRat.Captcha
             _handlers?.Reverse().Handing((handler, context) => handler.Validated(context,options), context);
             var result = context.GetResult();
             if (result.Token == null && result.Succeed) result.Token = Guid.NewGuid().ToString("N");
+            if (!result.Succeed) result.Token = null;
             return new ValueTask<ValidateResult>(result);
         }
 

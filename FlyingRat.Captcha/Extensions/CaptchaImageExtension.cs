@@ -26,12 +26,16 @@ namespace FlyingRat.Captcha.Extensions
             var model = new CaptchaViewModel();
             model.Index = JsonSerializer.Serialize(captcha.Index);
             model.Change = JsonSerializer.Serialize(captcha.Change);
-            model.Width = captcha.GapBackground.Width;
-            model.Height = captcha.GapBackground.Height;
+            model.Width = captcha.Backgorund.Width;
+            model.Height = captcha.Backgorund.Height;
             model.Row = captcha.Row;
             model.Col = captcha.Col;
             model.X = captcha.Points.Count;
             model.validate = validatePath;
+            model.Tips = captcha.Tips;
+            model.tw = captcha.TipWidth;
+            model.th = captcha.tipHeight;
+            model.Name = captcha.Name;
             if (imagePath != null)
             {
                 model.IsAction = true;
@@ -42,7 +46,7 @@ namespace FlyingRat.Captcha.Extensions
                 model.IsAction = false;
                 if (format == null) format = JpegFormat.Instance;
                 model.Gap = captcha.Gap?.ToBase64String(PngFormat.Instance);
-                model.BgGap = captcha.GapBackground?.ToBase64String(format);
+                model.BgGap = captcha.GapBackground?.ToBase64String(model.tw>0?PngFormat.Instance:format);
                 model.Full = captcha.Backgorund?.ToBase64String(format);
             }
 

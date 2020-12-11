@@ -29,5 +29,6 @@ namespace FlyingRat.Captcha
         public string Code { get; set; }
         public string Tips { get; set; }
         public string Token { get; set; }
+        public ValidateResult Validate { get; set; }
     }
 }

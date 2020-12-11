@@ -82,6 +82,20 @@ namespace FlyingRat.Captcha
             }
             return images;
         }
+        public async Task<List<Image<Rgba32>>> LoadRandImages(string directory)
+        {
+            var images=await LoadImages(directory);
+            var randImages = new List<Image<Rgba32>>(images.Count);
+            var count = images.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var index=Random.Next(0, images.Count);
+                randImages.Add(images[index]);
+                images.RemoveAt(index);
+            }
+            images.Clear();
+            return randImages;
+        }
 
         private string[] FindFiles(string dir)
         {
@@ -115,6 +129,5 @@ namespace FlyingRat.Captcha
                 return null;
             }
         }
-
     }
 }

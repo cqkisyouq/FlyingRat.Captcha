@@ -18,8 +18,14 @@ namespace FlyingRat.Captcha.Validator
         public override ValidateResult Validate(CaptchaContext context, BaseCaptchaOptions options)
         {
             var model = context.GetResult();
+            model.IsValidate = true;
+            model.AllowValidate = true;
+            model.Count++;
+            model.Succeed = false;
             var sourcePoints = context.Source.Points;
             var points = context.Validate.Points;
+            if (points?.Count == 0 || points.Count != sourcePoints?.Count) return model;
+
             var offset =options?.Offset ?? _options.Offset;
             model.Succeed = true;
             for (int i = 0; i < points.Count; i++)
@@ -37,9 +43,6 @@ namespace FlyingRat.Captcha.Validator
                 model.Succeed = false;
                 break;
             }
-            model.IsValidate = true;
-            model.AllowValidate = true;
-            model.Count++;
             return model;
         }
     }
