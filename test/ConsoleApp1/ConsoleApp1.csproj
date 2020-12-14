@@ -111,7 +111,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FlyingRat.Captcha\FlyingRat.Captcha.csproj" />
+    <ProjectReference Include="..\..\src\FlyingRat.Captcha\FlyingRat.Captcha.csproj" />
   </ItemGroup>
 
   <ItemGroup>
