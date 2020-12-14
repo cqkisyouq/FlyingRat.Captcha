@@ -4,7 +4,8 @@
             drawCaptcha: drawImage,
             options: {
                 url: null,
-                points:[],
+                points: [],
+                pointIcon:[],
                 validate: null,
                 validateCallback: null,
                 x: 0,
@@ -52,7 +53,7 @@
             method.options.data = data;
             //method.container.style.width = getNumberPx(data.width);
             method.isValidate = false;
-            method.options.points = [];
+            clearPoints();
             if (canvas == null) {
                 drawDivImage(data);
                 return;
@@ -164,6 +165,7 @@
             var span = document.createElement("span");
             span.innerText = method.options.data.tips;
             updateTips(span, true); 
+            clearPointEvent();
             switch (method.options.data.type) {
                 case 2:
                     bindControlSlider();
@@ -182,9 +184,6 @@
             gapImg.style.display = "block";
             method.options.sliderRoot.style.display = "block";
             method.options.sliderWidth = method.options.sliderRoot.clientWidth - $slider.clientWidth;
-            if ($slider.removeEventListener) {
-                $slider.removeEventListener("mousedown", moveDown);
-            }
             $slider.addEventListener("mousedown", moveDown);
         };
         function bindControlClick() {
@@ -216,23 +215,64 @@
             validatePoint(event.layerX, event.layerY);
         }
 
-        function validatePoint(x, y) {
-            if (method.options.validate && typeof method.options.validate === "function") {
-                method.options.validate(x, y);
-            }
-            let data = method.options.data, points = method.options.points;
-            if (points.length < data.x) {
-                points.push({ x: x, y: y });
-            }
-            if (points.length == data.x) {
-                $.post(data.validate, { points: points, tk: data.tk, type: data.name }, function (data) {
-                    method.isValidate = data.succeed;
-                    if (method.options.validateCallback && typeof method.options.validateCallback === "function") method.options.validateCallback(data);
-                });
-                method.options.points = [];
+        function clearPointEvent() {
+            method.options.imgRoot.onclick = null;
+            if (method.options.slider.removeEventListener) {
+                method.options.slider.removeEventListener("mousedown", moveDown);
             }
         }
 
+        function validatePoint(x, y) {
+            let custom = { handler: false};
+            if (isFunction(method.options.validate)) {
+                let result = method.options.validate(x, y);
+                custom.handler = !!result;
+            }
+            let data = method.options.data, points = method.options.points,icons=method.options.pointIcon;
+            if (points.length < data.x) {
+                let div = createNumber(x,y,points.length);
+                method.options.imgRoot.appendChild(div);
+                icons.push(div);
+                points.push({ x: x, y: y });
+            }
+            if (custom.handler) clearPoints();
+            if (!custom.handler && points.length == data.x && !method.isValidate) {
+                $.post(data.validate, { points: points, tk: data.tk }, function (data) {
+                    method.isValidate = data.succeed;
+                    if (data.refresh && !data.succeed) {
+                        autoDrawImage();
+                        return;
+                    }
+                    if (isFunction(method.options.validateCallback)) method.options.validateCallback(data);
+                    setTimeout(function () {
+                        clearPoints();
+                    }, 1000);
+                });
+            }
+        }
+        function createNumber(x,y,number) {
+            number = parseInt(number);
+            let div = document.createElement("div");
+            div.style.backgroundImage = "url(" + "/Image/captcha_icon.png" + ")";
+            div.style.width = getNumberPx(26);
+            div.style.height = getNumberPx(33);
+            div.style.position = "absolute";
+            div.style.top = getNumberPx(y - 33);
+            div.style.left = getNumberPx(x - 13);
+            div.style.backgroundPositionY = getNumberPx(-399 - number * 36);
+            return div;
+        }
+        function clearPoints() {
+            method.options.points = [];
+            for (var i = 0; i < method.options.pointIcon.length; i++) {
+                method.options.pointIcon[i].remove();
+            }
+            method.options.pointIcon = [];
+        }
+        function isFunction(func) {
+            if (func && typeof func === "function") return true;
+            return false;
+        }
         function getNumberPx(number) {
             return number + "px";
         }

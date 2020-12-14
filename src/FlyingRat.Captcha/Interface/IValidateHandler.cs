@@ -4,12 +4,16 @@ using FlyingRat.Captcha.Validator;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FlyingRat.Captcha.Interface
 {
-    public interface IValidateHandler
+    public interface ICaptchaHandler
     {
-        void Validating(CaptchaContext context, BaseCaptchaOptions options = null);
-        void Validated(CaptchaContext context, BaseCaptchaOptions options = null);
+        string Type { get; }
+        Task Creating(CaptchaContext context);
+        Task Created(CaptchaContext context);
+        Task Validating(CaptchaValidateContext context, BaseCaptchaOptions options = null);
+        Task Validated(CaptchaValidateContext context, BaseCaptchaOptions options = null);
     }
 }

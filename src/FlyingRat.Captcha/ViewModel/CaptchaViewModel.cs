@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FlyingRat.Captcha
+namespace FlyingRat.Captcha.ViewModel
 {
     public class CaptchaViewModel
     {
@@ -24,6 +24,5 @@ namespace FlyingRat.Captcha
         public int tw { get; set; }
         public int th { get; set; }
         public CaptchaType Type { get; set; }
-        public string Name { get; set; }
     }
 }

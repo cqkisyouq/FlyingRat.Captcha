@@ -7,6 +7,8 @@ namespace FlyingRat.Captcha.Interface
     public interface IValidator
     {
         string Type { get; }
-        ValidateResult Validate(CaptchaContext context, BaseCaptchaOptions options = null);
+        BaseCaptchaOptions Options {get;}
+        bool AllowValidate(CaptchaValidateContext context, BaseCaptchaOptions options = null);
+        ValidateResult Validate(CaptchaValidateContext context, BaseCaptchaOptions options = null);
     }
 }

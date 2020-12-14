@@ -9,7 +9,7 @@ namespace FlyingRat.Captcha
 {
     public static class ValidateHandlerExtension
     {
-        public static void Handing(this IEnumerable<IValidateHandler> handlers,Action<IValidateHandler,CaptchaContext> action,CaptchaContext context)
+        public static void Handing<T>(this IEnumerable<ICaptchaHandler> handlers,Action<ICaptchaHandler,T> action,T context)
         {
             if (handlers == null || action == null) return;
             foreach (var item in handlers)

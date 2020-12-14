@@ -8,6 +8,6 @@ namespace FlyingRat.Captcha.Interface
 {
     public interface IValidateManager
     {
-        ValidateResult Validate(CaptchaContext context);
+        ValidateResult Validate(CaptchaValidateContext context);
     }
 }

@@ -11,6 +11,14 @@ namespace FlyingRat.Captcha.Validator
     {
         public string Type => typeof(T).Name;
 
-        public abstract ValidateResult Validate(CaptchaContext context, BaseCaptchaOptions options = null);
+        public abstract BaseCaptchaOptions Options { get; }
+
+        public virtual bool AllowValidate(CaptchaValidateContext context, BaseCaptchaOptions options = null)
+        {
+            var result = context.GetResult();
+            result.AllowValidate = options==null? result.Count<Options?.Validate_Max: result.Count < options.Validate_Max;
+            return result.AllowValidate;
+        }
+        public abstract ValidateResult Validate(CaptchaValidateContext context, BaseCaptchaOptions options = null);
     }
 }

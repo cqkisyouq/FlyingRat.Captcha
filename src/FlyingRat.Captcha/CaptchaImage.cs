@@ -1,4 +1,5 @@
-﻿using FlyingRat.Captcha.Validator;
+﻿using FlyingRat.Captcha.Configuration;
+using FlyingRat.Captcha.Validator;
 using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,7 @@ namespace FlyingRat.Captcha
         /// Image after random gaps
         /// </summary>
         public Image GapBackground { get; set; }
+        public BaseCaptchaOptions Options { get; set; }
         /// <summary>
         /// 
         /// </summary>

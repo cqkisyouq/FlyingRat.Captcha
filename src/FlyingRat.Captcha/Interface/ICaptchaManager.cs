@@ -14,7 +14,7 @@ namespace FlyingRat.Captcha.Interface
     {
         ValueTask<CaptchaImage> Captcha<T>(BaseCaptchaOptions options=null) where T:ICaptcha,new();
         ValueTask<CaptchaImage> Captcha(string type, BaseCaptchaOptions options = null);
-        ValueTask<ValidateResult> Validate<T>(CaptchaContext context, BaseCaptchaOptions options = null) where T:ICaptcha,new();
-        ValueTask<ValidateResult> Validate(string captcha,CaptchaContext context, BaseCaptchaOptions options = null);
+        ValueTask<ValidateResult> Validate<T>(CaptchaValidateContext context, BaseCaptchaOptions options = null) where T:ICaptcha,new();
+        ValueTask<ValidateResult> Validate(string captcha,CaptchaValidateContext context, BaseCaptchaOptions options = null);
     }
 }

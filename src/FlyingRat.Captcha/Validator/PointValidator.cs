@@ -11,15 +11,18 @@ namespace FlyingRat.Captcha.Validator
     public class PointValidator : BaseValidator<PointCaptcha>
     {
         private readonly PointOptions _options;
+
+        public override BaseCaptchaOptions Options => _options;
+
         public PointValidator(IOptions<PointOptions> options)
         {
             _options = options?.Value;
         }
-        public override ValidateResult Validate(CaptchaContext context, BaseCaptchaOptions options)
+        public PointValidator() { }
+        public override ValidateResult Validate(CaptchaValidateContext context, BaseCaptchaOptions options)
         {
             var model = context.GetResult();
             model.IsValidate = true;
-            model.AllowValidate = true;
             model.Count++;
             model.Succeed = false;
             var sourcePoints = context.Source.Points;

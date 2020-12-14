@@ -9,6 +9,9 @@ namespace FlyingRat.Captcha.Validator
     public class SliderValidator : BaseValidator<SliderCaptcha>
     {
         private readonly SliderOptions _options;
+
+        public override BaseCaptchaOptions Options => _options;
+
         public SliderValidator(IOptions<SliderOptions> options)
         {
             _options = options?.Value;
@@ -17,7 +20,7 @@ namespace FlyingRat.Captcha.Validator
         {
 
         }
-        public override ValidateResult Validate(CaptchaContext context, BaseCaptchaOptions options)
+        public override ValidateResult Validate(CaptchaValidateContext context, BaseCaptchaOptions options)
         {
             var model = context.GetResult();
             model.IsValidate = true;

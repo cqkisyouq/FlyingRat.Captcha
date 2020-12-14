@@ -17,7 +17,7 @@ namespace FlyingRat.Captcha.Validator
         /// <summary>
         /// 允许验证
         /// </summary>
-        public bool AllowValidate { get; set; }
+        public bool AllowValidate { get; set; } = true;
         /// <summary>
         /// 验证次数
         /// </summary>

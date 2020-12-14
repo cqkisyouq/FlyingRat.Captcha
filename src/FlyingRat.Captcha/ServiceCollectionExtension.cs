@@ -11,24 +11,41 @@ namespace FlyingRat.Captcha
 {
     public static class ServiceCollectionExtension
     {
-        public static IServiceCollection AddCaptcha(this IServiceCollection service)
+        public static IServiceCollection AddCaptchaCore(this IServiceCollection service)
         {
-            service.AddOptions<SliderOptions>();
-            service.AddOptions<PointOptions>();
             service.AddSingleton<ImageDriver>();
             service.AddSingleton<IImageProvider,ImageFileProvider>();
 
-            service.AddScoped<ICaptcha, SliderCaptcha>();
-            service.AddScoped<ICaptcha, PointCaptcha>();
+            service.AddCaptcha<SliderCaptcha>();
+            service.AddCaptcha<PointCaptcha>();
             service.AddScoped<ICaptchaFactory, DefaultCaptchaFactory>();
             service.AddScoped<ICaptchaManager, CaptchaManager>();
 
-            service.AddScoped<IValidator,SliderValidator>();
-            service.AddScoped<IValidator, PointValidator>();
+            service.AddCaptchaValidator<SliderValidator>();
+            service.AddCaptchaValidator<PointValidator>();
             service.AddScoped<IValidateManager, ValidatorManager>();
 
             service.AddTransient<CaptchaImageBuilder>();
             service.AddScoped<ICaptchaValidatorFactory, DefaultCaptchaValidatorFactory>();
+
+            service.AddSingleton<IValidateHandlerFactory, DefaultValidateHandlerFactory>();
+            service.AddSingleton<ITokenGenerate, DefaultTokenGenerate>(); 
+            return service;
+        }
+
+        public static IServiceCollection AddCaptcha<T>(this IServiceCollection service) where T : ICaptcha, new()
+        {
+            service.AddScoped(typeof(ICaptcha), typeof(T));
+            return service;
+        }
+        public static IServiceCollection AddCaptchaValidator<T>(this IServiceCollection service) where T : IValidator, new()
+        {
+            service.AddScoped(typeof(IValidator), typeof(T));
+            return service;
+        }
+        public static IServiceCollection AddCaptchaHandler<T>(this IServiceCollection service) where T:ICaptchaHandler,new ()
+        {
+            service.AddSingleton(typeof(ICaptchaHandler), typeof(T));
             return service;
         }
     }

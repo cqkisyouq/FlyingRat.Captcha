@@ -57,22 +57,23 @@
 @section Scripts{
     <script src="~/js/flyingrat.captcha.js"></script>
     <script>
-    var length = [],reType=null;
+        var length = [], reType = null, cap, divCap;
     function validate(x, y) {
         if (length.length < this.data.x) {
             length.push({ x: x, y: y });
         }
         if (length.length == this.data.x) {
             $.post(this.data.validate, { points: length, tk: this.data.tk, type: reType}, function (data) {
-                console.debug("验证结果：",data);
+                console.debug("验证结果：", data);
             });
             length = [];
+            return true;
         }
     }
     function LoadImage(type) {
         reType = type;
-        var cap = new captcha(document.querySelector("#canvasCaptach"), { url: "@Html.Raw(Url.Action("RandImage"))?type="+type+"&row=3&col=15"});
-        var divCap = new captcha(document.querySelector("#divCaptach"), { validate: validate});
+        cap = new captcha(document.querySelector("#canvasCaptach"), { url: "@Html.Raw(Url.Action("RandImage"))?type="+type+"&row=3&col=15"});
+        divCap = new captcha(document.querySelector("#divCaptach"), { url: "@Html.Raw(Url.Action("RandImage"))?type="+type+"&row=2&col=15",validate: validate});
         cap.drawCaptcha();
         $.get('@Html.Raw(Url.Action("RandImage"))', {type:type,row:2,col:15}, function (data) {
             var back = document.getElementById("background");

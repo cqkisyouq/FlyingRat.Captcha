@@ -1,4 +1,5 @@
-﻿using FlyingRat.Captcha.Validator;
+﻿using FlyingRat.Captcha.Configuration;
+using FlyingRat.Captcha.Validator;
 using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
@@ -27,8 +28,9 @@ namespace FlyingRat.Captcha
         public Image Gap { get; set; }
         public CaptchaType Type { get; set; }
         public string Code { get; set; }
-        public string Tips { get; set; }
         public string Token { get; set; }
         public ValidateResult Validate { get; set; }
+        public BaseCaptchaOptions Options { get; set; }
+        public string Name { get; set; }
     }
 }

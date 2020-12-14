@@ -7,13 +7,8 @@ using FlyingRat.Captcha.Validator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Captcha.Controllers
@@ -41,8 +36,8 @@ namespace Captcha.Controllers
         }
         public async ValueTask<IActionResult> RandImage(string type= "SliderCatpcha", int? row = 2, int? col = 13)
         {
-            var captcha =await _captchaManager.Captcha(type, new BaseCaptchaOptions() { Col=col.Value,Row=row.Value});
-            var model = captcha.ToViewModel(Url.Action("Validate"));
+            var captcha =await _captchaManager.Captcha(type, new BaseCaptchaOptions() { Col=col.Value,Row=row.Value,Validate_Max=2});
+            var model = captcha.ToViewModel(Url.Action("Validate"),hasBackground:true);
             //model.BgGap = Url.Action("SliderBackground");
             //model.Full = Url.Action("Background");
             //model.Gap = Url.Action("Slider");
@@ -76,13 +71,13 @@ namespace Captcha.Controllers
             return File(ms.ToArray(), "image/png");
         }
 
-        public async ValueTask<IActionResult> Validate(ValidateModel model,string tk,string type="SliderCatpcha")
+        public async ValueTask<IActionResult> Validate(ValidateModel model,string tk)
         {
             var data = _memoryCache.Get<CaptchaCacheModel>(cacheKey + tk);
             if (data == null) return Json(ValidateResult.Failed);
-            var context = new CaptchaContext(new ValidateModel(data.Points), model,data.Validate);
-            data.Validate =await _captchaManager.Validate(type, context);
-            return Json(data.Validate);
+            var context = new CaptchaValidateContext(new ValidateModel(data.Points), model,data.Validate);
+            data.Validate =await _captchaManager.Validate(data.Name, context,data.Options);
+            return Json(data.Validate?.ToValidateModel());
         }
     }
 }

@@ -8,6 +8,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats;
+using FlyingRat.Captcha.ViewModel;
 
 namespace FlyingRat.Captcha.Extensions
 {
@@ -20,7 +21,7 @@ namespace FlyingRat.Captcha.Extensions
         /// <param name="imagePath">Get pictures using HTTP</param>
         /// <param name="format">Get pictures using Base64</param>
         /// <returns></returns>
-        public static CaptchaViewModel ToViewModel(this CaptchaImage captcha,string validatePath,Action<CaptchaViewModel> imagePath=null,IImageFormat format=null)
+        public static CaptchaViewModel ToViewModel(this CaptchaImage captcha,string validatePath,Action<CaptchaViewModel> imagePath=null,bool hasBackground=false,IImageFormat format=null)
         {
             if (captcha == null) return new CaptchaViewModel();
             var model = new CaptchaViewModel();
@@ -35,7 +36,6 @@ namespace FlyingRat.Captcha.Extensions
             model.Tips = captcha.Tips;
             model.tw = captcha.TipWidth;
             model.th = captcha.tipHeight;
-            model.Name = captcha.Name;
             if (imagePath != null)
             {
                 model.IsAction = true;
@@ -47,7 +47,7 @@ namespace FlyingRat.Captcha.Extensions
                 if (format == null) format = JpegFormat.Instance;
                 model.Gap = captcha.Gap?.ToBase64String(PngFormat.Instance);
                 model.BgGap = captcha.GapBackground?.ToBase64String(model.tw>0?PngFormat.Instance:format);
-                model.Full = captcha.Backgorund?.ToBase64String(format);
+                if(hasBackground) model.Full = captcha.Backgorund?.ToBase64String(format);
             }
 
             if (model.X == 1)
@@ -67,9 +67,10 @@ namespace FlyingRat.Captcha.Extensions
             model.Gap = captcha.Gap;
             model.GapBackground = captcha.GapBackground;
             model.Points = captcha.Points;
-            model.Tips = captcha.Tips;
             model.Token = captcha.Token;
             model.Type = captcha.Type;
+            model.Name = captcha.Name;
+            model.Options = captcha.Options;
             return model;
         }
     }

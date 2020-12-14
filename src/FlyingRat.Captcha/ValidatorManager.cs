@@ -13,7 +13,7 @@ namespace FlyingRat.Captcha
         {
 
         }
-        public ValidateResult Validate(CaptchaContext context)
+        public ValidateResult Validate(CaptchaValidateContext context)
         {
             throw new NotImplementedException();
         }

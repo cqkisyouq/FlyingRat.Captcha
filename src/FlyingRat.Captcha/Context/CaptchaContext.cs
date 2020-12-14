@@ -1,4 +1,4 @@
-﻿using FlyingRat.Captcha.Validator;
+﻿using FlyingRat.Captcha.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,25 +7,13 @@ namespace FlyingRat.Captcha.Context
 {
     public class CaptchaContext
     {
-        public CaptchaContext(ValidateModel source,ValidateModel validate,ValidateResult result)
+        public CaptchaContext() { }
+        public CaptchaContext(CaptchaImage captcha=null, BaseCaptchaOptions options=null)
         {
-            Source = source;
-            Validate = validate;
-            Result = result;
+            this.Captcha = captcha;
+            this.Options = options;
         }
-        public CaptchaContext(ValidateModel source, ValidateModel validate) : this(source, validate, null)
-        {
-
-        }
-        private ValidateResult Result { get; set; }
-        public ValidateModel Source { get; set; }
-        public ValidateModel Validate { get; set; }
-        public CaptchaType Type { get; set; }
-
-        public ValidateResult GetResult()
-        {
-            if (Result == null) Result = ValidateResult.Failed;
-            return this.Result;
-        }
+        public CaptchaImage Captcha { get; set; }
+        public BaseCaptchaOptions Options { get; set; }
     }
 }
