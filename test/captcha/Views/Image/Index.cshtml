@@ -1,15 +1,62 @@
-﻿@{
-    Layout = null;
+﻿<input type="button" onclick="LoadImage('PointCaptcha')" value="点击验证" />
+<input type="button" onclick="LoadImage('SliderCaptcha')" value="滑块验证" />
+<div style="display:flex;">
+    <div class="captcha-container" id="divCaptach">
+        <div class="captcha-control-image">
+            <div class="captcha-img"></div>
+            <img class="captcha-slider-img" />
+        </div>
+        <div class="captcha-control">
+            <div class="captcha-control-tips">
+                <span>向右拖动滑块填充拼图</span>
+            </div>
+            <div class="captcha-control-slider">
+                <div class="captcha-slider-bg"></div>
+                <div class="captcha-slider"><span class="fa fa-arrow-right"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="captcha-container" id="canvasCaptach">
+        <div class="captcha-control-image">
+            <canvas id="brush">请使用更高版本的浏览器</canvas>
+            <img class="captcha-slider-img" />
+        </div>
+        <div class="captcha-control">
+            <div class="captcha-control-tips">
+                <span>向右拖动滑块填充拼图</span>
+            </div>
+            <div class="captcha-control-slider">
+                <div class="captcha-slider-bg"></div>
+                <div class="captcha-slider">>></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="display:flex;">
+    <div>
+        <img id="background" src="" class="pd" />
+        <div>完整的背景图</div>
+    </div>
+    <div>
+        <img id="randBackground" src="" class="pd" />
+        <div>带缺口乱序后的背景图</div>
+    </div>
+</div>
+
+@section Styles{
+    <link href="~/css/flyingrat.captcha.css" rel="stylesheet" />
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        .pd {
+            margin-left: 5px;
+        }
+    </style>
 }
-<script src="~/js/jquery-3.2.1.min.js"></script>
-<link href="~/css/flyingrat.captcha.css" rel="stylesheet" />
-<script src="~/js/flyingrat.captcha.js"></script>
-<style>
-    .pd {
-        margin-left: 5px;
-    }
-</style>
-<script>
+
+@section Scripts{
+    <script src="~/js/flyingrat.captcha.js"></script>
+    <script>
     var length = [],reType=null;
     function validate(x, y) {
         if (length.length < this.data.x) {
@@ -36,56 +83,5 @@
             //cap.drawCaptcha(data);
         })
     }
-</script>
-<html>
-<head>
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-</head>
-<body style="margin:0px;padding:0px;">
-    <input type="button" onclick="LoadImage('PointCaptcha')" value="点击验证" />
-    <input type="button" onclick="LoadImage('SliderCaptcha')" value="滑块验证" />
-    <div style="display:flex;">
-        <div class="captcha-container" id="divCaptach">
-            <div class="captcha-control-image">
-                <div class="captcha-img"></div>
-                <img class="captcha-slider-img" />
-            </div>
-            <div class="captcha-control">
-                <div class="captcha-control-tips">
-                    <span>向右拖动滑块填充拼图</span>
-                </div>
-                <div class="captcha-control-slider">
-                    <div class="captcha-slider-bg"></div>
-                    <div class="captcha-slider"><span class="fa fa-arrow-right"></span></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="captcha-container" id="canvasCaptach">
-            <div class="captcha-control-image">
-                <canvas id="brush">请使用更高版本的浏览器</canvas>
-                <img class="captcha-slider-img" />
-            </div>
-            <div class="captcha-control">
-                <div class="captcha-control-tips">
-                    <span>向右拖动滑块填充拼图</span>
-                </div>
-                <div class="captcha-control-slider">
-                    <div class="captcha-slider-bg"></div>
-                    <div class="captcha-slider"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div style="display:flex;">
-        <div>
-            <img id="background" src="" class="pd" />
-            <div>完整的背景图</div>
-        </div>
-        <div>
-            <img id="randBackground" src="" class="pd" />
-            <div>带缺口乱序后的背景图</div>
-        </div>
-    </div>
-</body>
-</html>
+    </script>
+}

@@ -11,6 +11,10 @@
     position: relative;
 }
 
+    .captcha-control-image canvas {
+        display: block;
+    }
+
 .captcha-control {
     height: 40px;
     border-radius: 2px;
@@ -28,14 +32,15 @@
     line-height: 40px;
     position: absolute;
     text-align: center;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select:none;
 }
 
-.captcha-control-tips img{
-    display:inline-block;
-}
+    .captcha-control-tips img {
+        display: inline-block;
+    }
 
 .captcha-control-slider {
     height: 100%;
@@ -45,12 +50,17 @@
 
 .captcha-slider {
     position: relative;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    align-content:center;
     width: 40px;
     height: 40px;
     border: 1px solid #e4e7eb;
     background-color: white;
     float: left;
     cursor: pointer;
+    user-select:none;
 }
 
 .captcha-slider-bg {
@@ -63,6 +73,6 @@
 
 .captcha-slider-img {
     position: absolute;
-    display:none;
+    display: none;
     left: 0px;
 }

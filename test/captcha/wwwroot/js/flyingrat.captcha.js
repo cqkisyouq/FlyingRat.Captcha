@@ -50,7 +50,7 @@
             }
             let canvas = method.options.canvas, container = method.container;
             method.options.data = data;
-            method.container.style.width = data.width;
+            //method.container.style.width = getNumberPx(data.width);
             method.isValidate = false;
             method.options.points = [];
             if (canvas == null) {
@@ -96,8 +96,8 @@
             container.style.display = "block";
             let url =data.isAction?data.bgGap + "?tk=" + data.tk:data.bgGap;
             let image = document.createElement("div");
-            div.style.width = data.width;
-            div.style.height = data.height;
+            div.style.width = getNumberPx(data.width);
+            div.style.height = getNumberPx(data.height);
             //div.style.backgroundImage = "url(" + url + ")";
             div.innerHTML = "";
             let change = JSON.parse(data.change);
@@ -118,10 +118,10 @@
                 if (x == 0) xxpos = 0;
                 let item = image.cloneNode();
                 item.style.backgroundImage = "url(" + url + ")";
-                item.style.backgroundPositionX = -xxpos + "px";
-                item.style.backgroundPositionY = -y * height + "px";
-                item.style.width = curWidth + "px";
-                item.style.height = height + "px";
+                item.style.backgroundPositionX = getNumberPx(-xxpos);
+                item.style.backgroundPositionY = getNumberPx(-y * height);
+                item.style.width = getNumberPx(curWidth);
+                item.style.height =getNumberPx(height);
                 item.style.float = "left";
                 xxpos += curWidth;
                 images[index] = item;
@@ -146,6 +146,7 @@
             let mx = px - method.options.x;
             if (mx <= 0) mx = 0;
             if (mx > method.options.sliderWidth) mx = method.options.sliderWidth;
+            mx =getNumberPx(mx);
             if (method.options.slider) method.options.slider.style.left = mx;
             if (method.options.sliderImg) method.options.sliderImg.style.left = mx;
             if (method.options.sliderBackground) method.options.sliderBackground.style.width = mx;
@@ -177,7 +178,7 @@
         function bindControlSlider() {
             let $slider = method.options.slider, gapImg = method.options.sliderImg;
             gapImg.src =method.options.data.isAction?method.options.data.gap + "?tk=" + method.options.data.tk:method.options.data.gap;
-            gapImg.style.top = method.options.data.y;
+            gapImg.style.top = getNumberPx(method.options.data.y);
             gapImg.style.display = "block";
             method.options.sliderRoot.style.display = "block";
             method.options.sliderWidth = method.options.sliderRoot.clientWidth - $slider.clientWidth;
@@ -194,11 +195,11 @@
 
             var div =document.createElement("div");
             var bg = method.options.isAction ? method.options.data.bgGap + "?tk=" + method.options.data.tk : method.options.data.bgGap;
-            div.style.width = method.options.data.tw;
-            div.style.height = method.options.data.th;
-            div.style.marginLeft = 5;
+            div.style.width = getNumberPx(method.options.data.tw);
+            div.style.height = getNumberPx(method.options.data.th);
+            div.style.marginLeft = getNumberPx(5);
             div.style.backgroundImage = "url(" + bg + ")";
-            div.style.backgroundPositionY = -method.options.data.height +"px";
+            div.style.backgroundPositionY = getNumberPx(-method.options.data.height);
             updateTips(div);
         }
 
@@ -230,6 +231,10 @@
                 });
                 method.options.points = [];
             }
+        }
+
+        function getNumberPx(number) {
+            return number + "px";
         }
         return method;
     };
