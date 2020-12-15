@@ -22,6 +22,9 @@
             <canvas id="brush">请使用更高版本的浏览器</canvas>
             <img class="captcha-slider-img" />
         </div>
+        <div class="captcha-control-top">
+            <div class="captcha-control-refresh"></div>
+        </div>
         <div class="captcha-control">
             <div class="captcha-control-tips">
                 <span>向右拖动滑块填充拼图</span>
@@ -72,6 +75,7 @@
     }
     function LoadImage(type) {
         reType = type;
+        if (cap) cap.destroy(); if (divCap) divCap.destroy();
         cap = new captcha(document.querySelector("#canvasCaptach"), { url: "@Html.Raw(Url.Action("RandImage"))?type="+type+"&row=3&col=15"});
         divCap = new captcha(document.querySelector("#divCaptach"), { url: "@Html.Raw(Url.Action("RandImage"))?type="+type+"&row=2&col=15",validate: validate});
         cap.drawCaptcha();

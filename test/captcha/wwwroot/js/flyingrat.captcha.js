@@ -2,12 +2,15 @@
     window.captcha = function (container, options) {
         let method = {
             drawCaptcha: drawImage,
+            destroy: destroy,
+            refresh: autoDrawImage,
             options: {
                 url: null,
                 points: [],
                 pointIcon:[],
                 validate: null,
                 validateCallback: null,
+                btn_refresh:null,
                 x: 0,
                 y: 0,
                 isMove: false,
@@ -21,10 +24,14 @@
                 sliderRoot:null,
                 imgRoot: null,
                 tips:null,
-                data: null
+                data: null,
+                css: {
+                    point:"captcha-point captcha-points-"
+                }
             },
             container: null,
-            isValidate: false
+            isValidate: false,
+            verifying: false
         }
         method.container = container || method.container;
         method.options.sliderRoot = method.container.querySelector(".captcha-control-slider");
@@ -38,6 +45,25 @@
         method.options.tips = method.container.querySelector(".captcha-control-tips");
         method.options.sliderWidth = method.options.sliderRoot.clientWidth;
         $.extend(method.options, options);
+        let refbtn = method.container.querySelector(".captcha-control-refresh");
+        if (refbtn) refbtn.onclick = function () {
+            if (isFunction(method.options.btn_refresh)) method.options.btn_refresh();
+            else autoDrawImage();
+        };
+        function initCaptcha() {
+            clearPoints();
+            clearPointEvent();
+            method.options.x = method.options.y = method.options.sliderWidth = 0;
+            method.options.isMove = false;
+            method.options.data = null;
+            method.isValidate = false;
+            method.verifying = false;
+        }
+        function destroy() {
+            initCaptcha();
+            method.options.url = null;
+            method = null;
+        }
 
         function autoDrawImage() {
             $.get(method.options.url,null, function (data) {
@@ -45,15 +71,13 @@
             })
         }
         function drawImage(data) {
+            initCaptcha();
             if (!data) {
                 autoDrawImage();
                 return;
             }
             let canvas = method.options.canvas, container = method.container;
             method.options.data = data;
-            //method.container.style.width = getNumberPx(data.width);
-            method.isValidate = false;
-            clearPoints();
             if (canvas == null) {
                 drawDivImage(data);
                 return;
@@ -132,6 +156,7 @@
             }
             bindControl();
         };
+
         function moveDown(event) {
             let ev = event || window.event;
             method.options.x = ev.clientX;
@@ -165,7 +190,6 @@
             var span = document.createElement("span");
             span.innerText = method.options.data.tips;
             updateTips(span, true); 
-            clearPointEvent();
             switch (method.options.data.type) {
                 case 2:
                     bindControlSlider();
@@ -209,72 +233,115 @@
         }
 
         function sliderPoint(x, y) {
-            validatePoint(x, y);
+            let result = validatePoint(x, y);
+            if (result.validate) addPoint(x, y);
+            verify(result);
         }
         function clickPoint(event) {
-            validatePoint(event.layerX, event.layerY);
+            let x = event.layerX, y = event.layerY;
+            let result = validatePoint(x, y);
+            if (result.validate) {
+                let index = method.options.points.length;
+                drawPoint(x, y, index + 1, function (div, index) {
+                    div.style.top = getNumberPx(y - div.clientHeight);
+                    div.style.left = getNumberPx(x - (div.clientWidth>>1));
+                    div.onclick = function (event) {
+                        if (method.verifying) return;
+                        clearPoints(index-1);
+                        event.stopPropagation();
+                    }
+                })
+                addPoint(x, y);
+            }
+            verify(result);
         }
 
         function clearPointEvent() {
             method.options.imgRoot.onclick = null;
+            window.onmouseup = null;
+            window.onmousemove = null;
             if (method.options.slider.removeEventListener) {
                 method.options.slider.removeEventListener("mousedown", moveDown);
             }
         }
 
         function validatePoint(x, y) {
-            let custom = { handler: false};
+            let custom = { custom: false, validate: false };
+            if (method.verifying) return custom;
             if (isFunction(method.options.validate)) {
                 let result = method.options.validate(x, y);
-                custom.handler = !!result;
+                custom.custom = !!result;
             }
-            let data = method.options.data, points = method.options.points,icons=method.options.pointIcon;
-            if (points.length < data.x) {
-                let div = createNumber(x,y,points.length);
-                method.options.imgRoot.appendChild(div);
-                icons.push(div);
-                points.push({ x: x, y: y });
-            }
-            if (custom.handler) clearPoints();
-            if (!custom.handler && points.length == data.x && !method.isValidate) {
-                $.post(data.validate, { points: points, tk: data.tk }, function (data) {
-                    method.isValidate = data.succeed;
-                    if (data.refresh && !data.succeed) {
-                        autoDrawImage();
-                        return;
-                    }
-                    if (isFunction(method.options.validateCallback)) method.options.validateCallback(data);
-                    setTimeout(function () {
-                        clearPoints();
-                    }, 1000);
-                });
-            }
+            let data = method.options.data, points = method.options.points;
+            custom.validate = points.length < data.x;
+            return custom;
         }
-        function createNumber(x,y,number) {
-            number = parseInt(number);
-            let div = document.createElement("div");
-            div.style.backgroundImage = "url(" + "/Image/captcha_icon.png" + ")";
-            div.style.width = getNumberPx(26);
-            div.style.height = getNumberPx(33);
-            div.style.position = "absolute";
-            div.style.top = getNumberPx(y - 33);
-            div.style.left = getNumberPx(x - 13);
-            div.style.backgroundPositionY = getNumberPx(-399 - number * 36);
+        function addPoint(x, y) {
+            let point = { x: x, y: y };
+            method.options.points.push(point);
+            return point;
+        }
+        function drawPoint(x, y,index, callback) {
+            let div = createNumber(x, y, index);
+            method.options.imgRoot.appendChild(div);
+            method.options.pointIcon.push(div);
+            if (isFunction(callback)) callback(div, index);
             return div;
         }
-        function clearPoints() {
-            method.options.points = [];
-            for (var i = 0; i < method.options.pointIcon.length; i++) {
-                method.options.pointIcon[i].remove();
-            }
-            method.options.pointIcon = [];
+        function createNumber(x,y,number) {
+            number =isNaN(number)?0:parseInt(number);
+            let div = document.createElement("div");
+            //div.style.top = getNumberPx(y - 33);
+            //div.style.left = getNumberPx(x - 13);
+            div.className = method.options.css.point + number;
+            return div;
         }
+        function verify(custom) {
+            if (custom.custom) delayedClearPoints(1);
+            let data = method.options.data, points = method.options.points;
+            if (points.length != data.x || method.isValidate) return;
+            method.verifying = true;
+            $.post(data.validate, { points: points, tk: data.tk }, function (data) {
+                if (!method) return;
+                method.isValidate = data.succeed;
+                if (data.refresh && !data.succeed) {
+                    autoDrawImage();
+                    return;
+                }
+                if (isFunction(method.options.validateCallback)) method.options.validateCallback(data);
+                delayedClearPoints(1, function () { if (!method) return; method.verifying = false; });
+            })
+                .fail(function () {
+                    method.verifying = false;
+                });
+        }
+
+
+        function clearPoints(index) {
+            index =isNaN(index)?0:parseInt(index);
+            if (!method) return;
+            let points = method.options.points, icons = method.options.pointIcon;
+            method.options.points = points.slice(0, Math.max(index, 0));
+            if (method.options.pointIcon && !method.options.pointIcon.length) return;
+            method.options.pointIcon = icons.slice(0, Math.max(index, 0));
+            icons.slice(Math.min(index, icons.length)).every(function (item) {
+                item.remove();
+                return true;
+            });
+        }
+        function delayedClearPoints(second,callback) {
+            setTimeout(function () {
+                clearPoints();
+                if(isFunction(callback)) callback();
+            }, parseInt(second)*1000)
+        }
+
         function isFunction(func) {
             if (func && typeof func === "function") return true;
             return false;
         }
         function getNumberPx(number) {
-            return number + "px";
+            return parseInt(number) + "px";
         }
         return method;
     };
