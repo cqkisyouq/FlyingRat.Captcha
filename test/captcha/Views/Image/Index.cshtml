@@ -1,5 +1,6 @@
 ﻿<input type="button" onclick="LoadImage('PointCaptcha')" value="点击验证" />
 <input type="button" onclick="LoadImage('SliderCaptcha')" value="滑块验证" />
+<input type="button" onclick="handValidate()" value="提交验证" />
 <div style="display:flex;">
     <div class="captcha-container" id="divCaptach">
         <div class="captcha-control-image">
@@ -12,7 +13,7 @@
             </div>
             <div class="captcha-control-slider">
                 <div class="captcha-slider-bg"></div>
-                <div class="captcha-slider"><span class="fa fa-arrow-right"></span></div>
+                <div class="captcha-slider"><span class="captcha-slider-icon"></span></div>
             </div>
         </div>
     </div>
@@ -61,23 +62,27 @@
     <script src="~/js/flyingrat.captcha.js"></script>
     <script>
         var length = [], reType = null, cap, divCap;
-    function validate(x, y) {
-        if (length.length < this.data.x) {
-            length.push({ x: x, y: y });
-        }
-        if (length.length == this.data.x) {
-            $.post(this.data.validate, { points: length, tk: this.data.tk, type: reType}, function (data) {
-                console.debug("验证结果：", data);
-            });
-            length = [];
-            return true;
-        }
+        function validate(x, y,captcha) {
+            let isValidate = false;
+            let options = captcha.options;
+            if (length.length < options.data.x) {
+                length.push({ x: x, y: y });
+                isValidate = true;
+            }
+            if (length.length == options.data.x) {
+                $.post(options.data.validate, { points: length, tk: options.data.tk, type: reType}, function (data) {
+                    console.debug("验证结果：", data);
+                    captcha.validated(data);
+                });
+                length = [];
+            }
+            return isValidate;
     }
     function LoadImage(type) {
         reType = type;
         if (cap) cap.destroy(); if (divCap) divCap.destroy();
-        cap = new captcha(document.querySelector("#canvasCaptach"), { url: "@Html.Raw(Url.Action("RandImage"))?type="+type+"&row=3&col=15"});
-        divCap = new captcha(document.querySelector("#divCaptach"), { url: "@Html.Raw(Url.Action("RandImage"))?type="+type+"&row=2&col=15",validate: validate});
+        cap = new captcha(document.querySelector("#canvasCaptach"), { url: "@Html.Raw(Url.Action("RandImage"))?type=" + type + "&row=3&col=15", autoValidate:false});
+        divCap = new captcha(document.querySelector("#divCaptach"), { url: "@Html.Raw(Url.Action("RandImage"))?type=" + type + "&row=2&col=15", method: { validate: validate } });
         cap.drawCaptcha();
         $.get('@Html.Raw(Url.Action("RandImage"))', {type:type,row:2,col:15}, function (data) {
             var back = document.getElementById("background");
@@ -87,6 +92,10 @@
             divCap.drawCaptcha(data);
             //cap.drawCaptcha(data);
         })
-    }
+        }
+        function handValidate() {
+            if (cap && !cap.options.autoValidate) cap.validate();
+            if (divCap && !divCap.options.autoValidate) divCap.validate();
+        }
     </script>
 }

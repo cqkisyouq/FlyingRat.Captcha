@@ -56,6 +56,7 @@ namespace FlyingRat.Captcha.Extensions
             }
             model.Type = captcha.Type;
             model.Tk = captcha.Token;
+            model.Name = captcha.Name;
             return model;
         }
 

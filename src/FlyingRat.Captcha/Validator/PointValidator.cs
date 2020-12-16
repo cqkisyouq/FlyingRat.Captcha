@@ -4,6 +4,7 @@ using FlyingRat.Captcha.Interface;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace FlyingRat.Captcha.Validator
@@ -27,7 +28,7 @@ namespace FlyingRat.Captcha.Validator
             model.Succeed = false;
             var sourcePoints = context.Source.Points;
             var points = context.Validate.Points;
-            if (points?.Count == 0 || points.Count != sourcePoints?.Count) return model;
+            if (points?.Any() ?? true || points.Count != sourcePoints?.Count) return model;
 
             var offset =options?.Offset ?? _options.Offset;
             model.Succeed = true;

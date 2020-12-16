@@ -23,6 +23,7 @@ namespace FlyingRat.Captcha.ViewModel
         public string Tips { get; set; }
         public int tw { get; set; }
         public int th { get; set; }
+        public string Name { get; set; }
         public CaptchaType Type { get; set; }
     }
 }
