@@ -1,43 +1,148 @@
 ﻿(function (window, $) {
-    window.captcha = function (container, options) {
-        let method = {
-            options: {
-                url: null,
-                points: [],
-                pointIcon: [],
-                method: {
-                    setRequestData: null,
-                    validate: null,
-                    validateCallback: null,
-                    btn_refresh: null,
-                    setData: null,
-                    setResult: null,
-                    ready: null
-                },
-                x: 0,
-                y: 0,
-                autoValidate: true,
-                autoRefresh:true,
-                isMove: false,
-                divImg: null,
-                canvas: null,
-                slider: null,
-                sliderBackground: null,
-                sliderImg: null,
-                sliderWidth: 0,
-                controlRoot: null,
-                sliderRoot: null,
-                imgRoot: null,
-                tips: null,
-                data: null,
-                css: {
-                    point: "captcha-point captcha-points-"
-                }
-            },
-            container: null,
-            isValidate: false,
-            verifying: false
+    function bindControlSlider(method) {
+        let func = {
+            init: init,
+            destory: function () {}
         }
+        function init(){
+            window.onmouseup = null;
+            window.onmousemove = null;
+            if (method.options.slider.removeEventListener) {
+                method.options.slider.removeEventListener("mousedown", moveDown);
+            };
+            let $slider = method.options.slider, gapImg = method.options.sliderImg, isMove = false;
+            gapImg.src = method.options.data.isAction ? method.options.data.gap + "?tk=" + method.options.data.tk : method.options.data.gap;
+            gapImg.style.top = getNumberPx(method.options.data.y);
+            gapImg.style.display = "block";
+            gapImg.onload = function () {
+                method.options.sliderRoot.style.display = "block";
+                $slider.style.width = getNumberPx(gapImg.clientWidth);
+                method.options.sliderWidth = method.options.sliderRoot.clientWidth - $slider.clientWidth;
+                $slider.addEventListener("mousedown", moveDown);
+            };
+        }
+        function moveDown(event) {
+            let ev = event || window.event;
+            method.options.x = ev.clientX;
+            isMove = true;
+            window.onmouseup = moveUp;
+            window.onmousemove = move;
+        };
+        function move(event) {
+            if (!isMove) return;
+            let ev = event || window.event;
+            ev.preventDefault();
+            let px = ev.clientX;
+            let mx = px - method.options.x;
+            if (mx <= 0) mx = 0;
+            if (mx > method.options.sliderWidth) mx = method.options.sliderWidth;
+            if (method.options.slider) method.options.slider.style.left = getNumberPx(mx);
+            if (method.options.sliderImg) method.options.sliderImg.style.left = getNumberPx(mx);
+            if (method.options.sliderBackground) method.options.sliderBackground.style.width = getNumberPx(mx + method.options.slider.clientWidth);
+        };
+        function moveUp(event) {
+            if (!isMove) return;
+            isMove = false;
+            sliderPoint(parseInt(method.options.sliderImg.style.left), parseInt(method.options.sliderImg.style.top));
+            if (method.options.slider) method.options.slider.style.left = 0;
+            if (method.options.sliderImg) method.options.sliderImg.style.left = 0;
+            if (method.options.sliderBackground) method.options.sliderBackground.style.width = 0;
+        };
+        function sliderPoint(x, y) {
+            let result =method.validatePoint(x, y);
+            if (result.validate) method.addPoint(x, y);
+            method.verify(result);
+        };
+        return func;
+    };
+    function bindControlClick(method) {
+        let func = {
+            init: init,
+            destory: function () {
+                method.options.imgRoot.onclick = null;
+            }
+        };
+        function init() {
+            method.options.imgRoot.onclick = clickPoint;
+            if (!method.options.data.tw) return;
+            let div = document.createElement("div");
+            let bg = method.options.isAction ? method.options.data.bgGap + "?tk=" + method.options.data.tk : method.options.data.bgGap;
+            div.style.width = getNumberPx(method.options.data.tw);
+            div.style.height = getNumberPx(method.options.data.th);
+            div.style.marginLeft = getNumberPx(5);
+            div.style.backgroundImage = "url(" + bg + ")";
+            div.style.backgroundPositionY = getNumberPx(-method.options.data.height);
+            method.updateTips(div);
+        }
+        function clickPoint(event) {
+            let x = event.layerX, y = event.layerY;
+            let result = method.validatePoint(x, y);
+            if (result.validate) {
+                let index = method.options.points.length + 1;
+                let max = method.maxPoint;
+                method.drawPoint(x, y, index, function (div, index) {
+                    if (max == index - 1 && method.autoValidate) return;
+                    div.style.top = getNumberPx(y - div.clientHeight);
+                    div.style.left = getNumberPx(x - (div.clientWidth >> 1));
+                    div.onclick = function (event) {
+                        if (method.verifying && method.autoValidate) return;
+                        console.debug(index, method.verifying, method.autoValidate)
+                        method.clearPoints(index - 1);
+                        event.stopPropagation();
+                    }
+                })
+                method.addPoint(x, y);
+            }
+            method.verify(result);
+        };
+        return func;
+    }
+    function captcha(container, options) {
+        function template() {
+            let func = {
+                options: {
+                    url: null,
+                    points: [],
+                    pointIcon: [],
+                    method: {
+                        setRequestData: null,
+                        allowRefresh: null,
+                        validatePoint: null,
+                        validate: null,
+                        validated: null,
+                        btn_refresh: null,
+                        setData: null,
+                        setResult: null,
+                        ready: null
+                    },
+                    x: 0,
+                    y: 0,
+                    autoValidate: true,
+                    autoRefresh: true,
+                    isMove: false,
+                    divImg: null,
+                    canvas: null,
+                    slider: null,
+                    sliderBackground: null,
+                    sliderImg: null,
+                    sliderWidth: 0,
+                    controlRoot: null,
+                    sliderRoot: null,
+                    imgRoot: null,
+                    tips: null,
+                    modal: null,
+                    data: null,
+                    css: {
+                        point: "captcha-point captcha-points-"
+                    }
+                },
+                container: null,
+                isValidate: false,
+                verifying: false
+            };
+            return func;
+        };
+        let method = new template();
         method.container = container || method.container;
         method.options.sliderRoot = method.container.querySelector(".captcha-control-slider");
         method.options.slider = method.options.sliderRoot.querySelector(".captcha-slider");
@@ -48,6 +153,7 @@
         method.options.divImg = method.container.querySelector(".captcha-img");
         method.options.imgRoot = method.container.querySelector(".captcha-control-image");
         method.options.tips = method.container.querySelector(".captcha-control-tips");
+        method.options.modal = method.container.querySelector(".captcha-modal");
         method.options.sliderWidth = method.options.sliderRoot.clientWidth;
         $.extend(method.options, options);
         
@@ -58,8 +164,8 @@
         };
         let captchas = (function () {
             let func = {
-                "slidercaptcha": { bindControl: bindControlSlider,type:2},//sliderCaptcha
-                "pointcaptcha": { bindControl: bindControlClick ,type:3}//pointCaptcha}
+                "slidercaptcha": { bindControl: bindControlSlider(method), type: 2, ignoreAutoValidate: true},//sliderCaptcha
+                "pointcaptcha": { bindControl: bindControlClick(method), type: 3, ignoreAutoValidate: false}//pointCaptcha}
             };
             return func;
         })();
@@ -71,99 +177,72 @@
                 "captchas": { get: function () { return captchas; } },
                 "current": { get: function () { return captchas[method.name];} },
                 "points": { get: function () { return method.options.points; } },
+                "clearPoints": { get: function () { return clearPoints; } },
                 "maxPoint": { get: function () { return method.options.data.x || 0; } },
                 "pointIcons": { get: function () { return method.options.pointIcon; } },
                 "bindCaptcha": { get: function () { return setCaptcha; } },
                 "mapData": { get: function () { return mapData; } },
+                "mapResult": { get: function () { return mapResult; } },
                 "drawCaptcha": { get: function () { return drawImage; } },
+                "drawPoint": { get: function () { return drawPoint;}},
                 "destroy": { get: function () { return destroy; } },
                 "refresh": { get: function () { return autoDrawImage; } },
                 "validate": { get: function () { return requestVerfiy; } },
                 "validated": { get: function () { return verified; } },
                 "validatePoint": { get: function () { return validatePoint; } },
                 "addPoint": { get: function () { return addPoint; } },
-                "verify": { get: function () { return verify;}}
+                "verify": { get: function () { return verify; } },
+                "autoValidate": { get: function () { return isAutoType(); } },
+                "updateTips": { get: function () { return updateTips; } }
             })
         }
 
         function initCaptcha() {
             clearPoints();
-            clearPointEvent();
             method.options.x = method.options.y = method.options.sliderWidth = 0;
-            method.options.isMove = false;
             method.options.data = null;
             method.isValidate = false;
             method.verifying = false;
-            method.options.sliderRoot.style.display = "none";
-            method.options.sliderImg.style.display = "none";
+            show(method.options.modal, true);
+            show(method.options.sliderRoot, true);
+            show(method.options.sliderImg, true);
         }
         function destroy() {
-            initCaptcha();
-            method.options.url = null;
+            Object.keys(captchas).forEach(function (key) {
+                captchas[key].bindControl.destory();
+            })
+            clearPoints();
+            $.extend(method, new template());
             method = null;
         }
+
         function autoDrawImage() {
             $.get(method.options.url, null, function (data) {
                 drawImage(data);
             })
         }
         function drawImage(data) {
+            if (!data) { autoDrawImage();return;}
             initCaptcha();
-            if (!data) {
-                autoDrawImage();
-                return;
-            }
             if (isFunction(method.options.method.setData)) data = method.options.method.setData(data);
             data = mapData(data);
             let canvas = method.options.canvas, container = method.container;
             method.options.data = data;
-            if (canvas == null) {
-                drawDivImage(data);
-                return;
-            }
-            container.style.display = "block";
-            let ctx = canvas.getContext("2d");
-            canvas.setAttribute("width", data.width);
-            canvas.setAttribute("height", data.height);
-            let image = new Image();
-            image.src = data.isAction ? data.bgGap + "?tk=" + data.tk : data.bgGap;
-            image.onload = function () {
-                let dataIndex = JSON.parse(data.index);
-                let change = JSON.parse(data.change);
-                let width = Math.max(Math.floor(data.width / data.col), 1);
-                let height = Math.max(Math.floor(data.height / data.row), 1);
-                let xxpos = 0;
-                for (let i = 0; i < dataIndex.length; i++) {
-                    let index = dataIndex[i];
-                    let y = Math.floor(index / data.col);
-                    let x = index % data.col;
-
-                    let xy = Math.floor(i / data.col);
-                    let xx = i % data.col;
-                    let curWidth = width;
-                    let xpos = x * width;
-                    if (xx == 0) xxpos = 0;
-                    if (change && change.indexOf(index) >= 0) {
-                        curWidth = Math.max(data.width - (data.col - 1) * width, 0);
-                        curWidth = Math.max(curWidth, 0);
-                    }
-                    ctx.drawImage(image, xxpos, xy * height, curWidth, height, xpos, y * height, curWidth, height);
-                    xxpos += curWidth;
-                }
+            show(container, false);
+            canvas == null ? drawDivImage(data, callback) : drawCanvasImage(data, callback);
+            function callback() {
                 bindControl();
-                executeReady();
+                executeReady(method);
             }
         };
-        function drawDivImage(data) {
-            let div = method.options.divImg, container = method.container;
+        function drawDivImage(data,callback) {
+            let div = method.options.divImg;
             method.options.data = data;
             if (div == null) return;
-            container.style.display = "block";
             let url = data.isAction ? data.bgGap + "?tk=" + data.tk : data.bgGap;
             let image = document.createElement("div");
             div.style.width = getNumberPx(data.width);
             div.style.height = getNumberPx(data.height);
-            //div.style.backgroundImage = "url(" + url + ")";
             div.innerHTML = "";
             let change = JSON.parse(data.change);
             let dataIndex = JSON.parse(data.index);
@@ -194,42 +273,46 @@
             for (let i = 0; i < images.length; i++) {
                 div.appendChild(images[i]);
             }
-            bindControl();
-            executeReady();
+            if(isFunction(callback)) callback();
         };
+        function drawCanvasImage(data, callback) {
+            let canvas = method.options.canvas;
+            let ctx = canvas.getContext("2d");
+            canvas.setAttribute("width", data.width);
+            canvas.setAttribute("height", data.height);
+            let image = new Image();
+            image.src = data.isAction ? data.bgGap + "?tk=" + data.tk : data.bgGap;
+            image.onload = function () {
+                let dataIndex = JSON.parse(data.index);
+                let change = JSON.parse(data.change);
+                let width = Math.max(Math.floor(data.width / data.col), 1);
+                let height = Math.max(Math.floor(data.height / data.row), 1);
+                let xxpos = 0;
+                for (let i = 0; i < dataIndex.length; i++) {
+                    let index = dataIndex[i];
+                    let y = Math.floor(index / data.col);
+                    let x = index % data.col;
 
-        function moveDown(event) {
-            let ev = event || window.event;
-            method.options.x = ev.clientX;
-            method.options.isMove = true;
-            window.onmouseup = moveUp;
-            window.onmousemove = move;
-        };
-        function move(event) {
-            if (!method.options.isMove) return;
-            let ev = event || window.event;
-            ev.preventDefault();
-            let px = ev.clientX;
-            let mx = px - method.options.x;
-            if (mx <= 0) mx = 0;
-            if (mx > method.options.sliderWidth) mx = method.options.sliderWidth;
-            if (method.options.slider) method.options.slider.style.left = getNumberPx(mx);
-            if (method.options.sliderImg) method.options.sliderImg.style.left = getNumberPx(mx);
-            if (method.options.sliderBackground) method.options.sliderBackground.style.width = getNumberPx(mx + method.options.slider.clientWidth);
-        };
-        function moveUp(event) {
-            if (!method.options.isMove) return;
-            sliderPoint(parseInt(method.options.sliderImg.style.left), parseInt(method.options.sliderImg.style.top));
-            method.options.isMove = false;
-            if (method.options.slider) method.options.slider.style.left = 0;
-            if (method.options.sliderImg) method.options.sliderImg.style.left = 0;
-            if (method.options.sliderBackground) method.options.sliderBackground.style.width = 0;
-        };
+                    let xy = Math.floor(i / data.col);
+                    let xx = i % data.col;
+                    let curWidth = width;
+                    let xpos = x * width;
+                    if (xx == 0) xxpos = 0;
+                    if (change && change.indexOf(index) >= 0) {
+                        curWidth = Math.max(data.width - (data.col - 1) * width, 0);
+                        curWidth = Math.max(curWidth, 0);
+                    }
+                    ctx.drawImage(image, xxpos, xy * height, curWidth, height, xpos, y * height, curWidth, height);
+                    xxpos += curWidth;
+                }
+                if (isFunction(callback)) callback();
+            }
+        }
 
         function setCaptcha(key, options) {
             if (!options || typeof options !="object" || !key || !options.init&&!isFunction(options.init) ) return false;
             let type = isNaN(options.type) ? 0 : parseInt(options.type);
-            let captcha = { bindControl: options.init, type: type };
+            let captcha = { bindControl: options.init(method), type: type, ignoreAutoValidate:false };
             method.captchas[key.toLowerCase()] = captcha;
             return captcha;
         }
@@ -238,86 +321,23 @@
             span.innerText = method.options.data.tips;
             updateTips(span, true);
             let control = method.captchas[method.name];
-            if (control) control.bindControl();
+            if (control) control.bindControl.init();
         }
-        function bindControlSlider() {
-            let $slider = method.options.slider, gapImg = method.options.sliderImg;
-            gapImg.src = method.options.data.isAction ? method.options.data.gap + "?tk=" + method.options.data.tk : method.options.data.gap;
-            gapImg.style.top = getNumberPx(method.options.data.y);
-            gapImg.style.display = "block";
-            gapImg.onload = function () {
-                method.options.sliderRoot.style.display = "block";
-                $slider.style.width = getNumberPx(gapImg.clientWidth);
-                method.options.sliderWidth = method.options.sliderRoot.clientWidth - $slider.clientWidth;
-                $slider.addEventListener("mousedown", moveDown);
-            }
-        };
-        function bindControlClick() {
-            method.options.imgRoot.onclick = clickPoint;
-            if (!method.options.data.tw) return;
-
-            let div = document.createElement("div");
-            let bg = method.options.isAction ? method.options.data.bgGap + "?tk=" + method.options.data.tk : method.options.data.bgGap;
-            div.style.width = getNumberPx(method.options.data.tw);
-            div.style.height = getNumberPx(method.options.data.th);
-            div.style.marginLeft = getNumberPx(5);
-            div.style.backgroundImage = "url(" + bg + ")";
-            div.style.backgroundPositionY = getNumberPx(-method.options.data.height);
-            updateTips(div);
-        }
-
-        function executeReady() {
-            if (isFunction(method.options.method.ready)) {
-                method.options.method.ready();
+        function executeReady(captcha) {
+            if (captcha&&isFunction(captcha.options.method.ready)) {
+                captcha.options.method.ready(captcha);
             }
         }
-
         function updateTips(el, isNew) {
             if (isNew) method.options.tips.innerHTML = "";
             method.options.tips.appendChild(el)
         }
 
-        function sliderPoint(x, y) {
-            let result = validatePoint(x, y);
-            if (result.validate) addPoint(x, y);
-            verify(result);
-        }
-        function clickPoint(event) {
-            let x = event.layerX, y = event.layerY;
-            let result = validatePoint(x, y);
-            if (result.validate) {
-                let index = method.options.points.length + 1;
-                let max =method.maxPoint;
-                drawPoint(x, y, index, function (div, index) {
-                    if (max== index-1 && isAutoType()) return;
-                    div.style.top = getNumberPx(y - div.clientHeight);
-                    div.style.left = getNumberPx(x - (div.clientWidth >> 1));
-                    div.onclick = function (event) {
-                        if (method.verifying && isAutoType()) return;
-                        console.debug(index, method.verifying, isAutoType())
-                        clearPoints(index-1);
-                        event.stopPropagation();
-                    }
-                })
-                addPoint(x, y);
-            }
-            verify(result);
-        }
-
-        function clearPointEvent() {
-            method.options.imgRoot.onclick = null;
-            window.onmouseup = null;
-            window.onmousemove = null;
-            if (method.options.slider.removeEventListener) {
-                method.options.slider.removeEventListener("mousedown", moveDown);
-            }
-        }
-
         function validatePoint(x, y) {
             let custom = { custom: false, validate: false };
-            if (method.verifying && isAutoType()) return custom;
-            if (isFunction(method.options.method.validate)) {
-                let result = method.options.method.validate(x, y,method);
+            if (method.verifying && method.autoValidate) return custom;
+            if (isFunction(method.options.method.validatePoint)) {
+                let result = method.options.method.validatePoint(x, y,method);
                 custom.custom =true;
                 custom.validate = !!result;
             } else {
@@ -337,18 +357,40 @@
             if (isFunction(callback)) callback(div, index);
             return div;
         }
+        function clearPoints(index) {
+            index = isNaN(index) ? 0 : parseInt(index);
+            if (!method) return;
+            let points = method.options.points, icons = method.options.pointIcon;
+            method.options.points = points.slice(0, Math.max(index, 0));
+            if (method.options.pointIcon && !method.options.pointIcon.length) return;
+            method.options.pointIcon = icons.slice(0, Math.max(index, 0));
+            icons.slice(Math.min(index, icons.length)).every(function (item) {
+                item.remove();
+                return true;
+            });
+        }
+        function delayedClearPoints(second, callback) {
+            setTimeout(function () {
+                clearPoints();
+                if (isFunction(callback)) callback();
+            }, parseInt(second) * 1000)
+        }
         function createNumber(x, y, number) {
             number = isNaN(number) ? 0 : parseInt(number);
             let div = document.createElement("div");
-            //div.style.top = getNumberPx(y - 33);
-            //div.style.left = getNumberPx(x - 13);
             div.className = method.options.css.point + number;
             return div;
         }
+
         function verify(custom) {
             if (custom.custom || method.isValidate || method.maxPoint != method.points.length) return;
             method.verifying = true;
-            if (isAutoType()) requestVerfiy();
+            show(method.options.modal,false);
+            if (isFunction(method.options.method.validate)) {
+                let isvalid = method.options.method.validate(verified,method);
+                if (isvalid) return;
+            }
+            if (method.autoValidate) requestVerfiy();
             if (method.current.type != 3) requestVerfiy();
         }
         function requestVerfiy() {
@@ -369,39 +411,12 @@
             if (isFunction(method.options.method.setResult)) data = method.options.method.setResult(data);
             data = mapResult(data);
             method.isValidate = data.succeed;
-            if (data.refresh && !data.succeed && method.options.autoRefresh) {
+            if (data.refresh && (method.options.autoRefresh || isFunction(method.options.allowRefresh) && method.options.allowRefresh(data,method))){
                 autoDrawImage();
                 return;
             }
-            if (isFunction(method.options.method.validateCallback)) method.options.method.validateCallback(data);
-            delayedClearPoints(1, function () { if (!method) return; method.verifying = false; });
-        }
-
-        function clearPoints(index) {
-            index = isNaN(index) ? 0 : parseInt(index);
-            if (!method) return;
-            let points = method.options.points, icons = method.options.pointIcon;
-            method.options.points = points.slice(0, Math.max(index, 0));
-            if (method.options.pointIcon && !method.options.pointIcon.length) return;
-            method.options.pointIcon = icons.slice(0, Math.max(index, 0));
-            icons.slice(Math.min(index, icons.length)).every(function (item) {
-                item.remove();
-                return true;
-            });
-        }
-        function delayedClearPoints(second, callback) {
-            setTimeout(function () {
-                clearPoints();
-                if (isFunction(callback)) callback();
-            }, parseInt(second) * 1000)
-        }
-
-        function isFunction(func) {
-            if (func && typeof func === "function") return true;
-            return false;
-        }
-        function getNumberPx(number) {
-            return parseInt(number) + "px";
+            if (isFunction(method.options.method.validated)) method.options.method.validated(data);
+            delayedClearPoints(1, function () { if (!method) return; method.verifying = false; show(method.options.modal, true);});
         }
 
         function mapResult(data) {
@@ -414,9 +429,25 @@
             $.extend(innerData, data);
             return innerData;
         }
-        function isAutoType(auto) {
-            return method.current.type == 3 && method.options.autoValidate;
+
+        function isAutoType() {
+            return !method.current.ignoreAutoValidate && method.options.autoValidate;
         }
         return method;
     };
+
+    function show(element, hidden) {
+        if (!element) return;
+        element.style.display = !!hidden ? "none" : "block";
+    }
+
+    function getNumberPx(number) {
+        return parseInt(number) + "px";
+    }
+
+    function isFunction(func) {
+        if (func && typeof func === "function") return true;
+        return false;
+    }
+    window.captcha = captcha;
 })(window, jQuery)

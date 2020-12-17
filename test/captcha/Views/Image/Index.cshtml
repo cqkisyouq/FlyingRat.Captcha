@@ -35,7 +35,13 @@
                 <div class="captcha-slider">>></div>
             </div>
         </div>
-    </div>
+        <div class="captcha-modal">
+            
+         </div>
+            <div id="btn_block" style="display:none;">
+                <button id="btn_ok" class="btn-outline-primary btn-block mt-1" style="height:40px;">确定</button>
+            </div>
+        </div>
 </div>
 <div style="display:flex;">
     <div>
@@ -61,28 +67,41 @@
 @section Scripts{
     <script src="~/js/flyingrat.captcha.js"></script>
     <script>
-        var length = [], reType = null, cap, divCap;
-        function validate(x, y,captcha) {
-            let isValidate = false;
-            let options = captcha.options;
-            if (length.length < options.data.x) {
-                length.push({ x: x, y: y });
-                isValidate = true;
-            }
-            if (length.length == options.data.x) {
-                $.post(options.data.validate, { points: length, tk: options.data.tk, type: reType}, function (data) {
-                    console.debug("验证结果：", data);
-                    captcha.validated(data);
-                });
-                length = [];
-            }
-            return isValidate;
-    }
+        var cap, divCap;
+        function validate(callback, captcha) {
+            if (!captcha.autoValidate) return false;
+            $.post(captcha.options.data.validate, { points: captcha.points, tk: captcha.options.data.tk, type: captcha.current.type }, function (data) {
+                console.debug("验证结果：", data);
+                callback(data);
+            });
+            return true;
+        }
+        function validated(data) {
+            console.debug("拿到验证结果",data)
+        }
     function LoadImage(type) {
         reType = type;
         if (cap) cap.destroy(); if (divCap) divCap.destroy();
-        cap = new captcha(document.querySelector("#canvasCaptach"), { url: "@Html.Raw(Url.Action("RandImage"))?type=" + type + "&row=3&col=15", autoValidate:false});
-        divCap = new captcha(document.querySelector("#divCaptach"), { url: "@Html.Raw(Url.Action("RandImage"))?type=" + type + "&row=2&col=15", method: { validate: validate } });
+        cap = new captcha(document.querySelector("#canvasCaptach"), {
+            url: "@Html.Raw(Url.Action("RandImage"))?type=" + type + "&row=3&col=15",
+            autoValidate: true,
+            method: {
+                ready: function (captcha) {
+                    if (!captcha.options.autoValidate) {
+                        $("#btn_block").show();
+                        $("#btn_ok").unbind("click").click("click", function () {
+                            captcha.validate();
+                    })
+                    }
+                },
+                validated: validated
+            }
+        });
+        divCap = new captcha(document.querySelector("#divCaptach"), {
+            url: "@Html.Raw(Url.Action("RandImage"))?type=" + type + "&row=2&col=15",
+            method: { validate: validate, validated: validated},
+            autoValidate:true
+        });
         cap.drawCaptcha();
         $.get('@Html.Raw(Url.Action("RandImage"))', {type:type,row:2,col:15}, function (data) {
             var back = document.getElementById("background");
