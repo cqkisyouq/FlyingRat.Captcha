@@ -36,7 +36,9 @@
             </div>
         </div>
         <div class="captcha-modal">
-            
+            <div class="captcha-modal-body">
+                <div class="captcha-icon-refresh"></div>
+            </div>
          </div>
             <div id="btn_block" style="display:none;">
                 <button id="btn_ok" class="btn-outline-primary btn-block mt-1" style="height:40px;">确定</button>
@@ -84,7 +86,7 @@
         if (cap) cap.destroy(); if (divCap) divCap.destroy();
         cap = new captcha(document.querySelector("#canvasCaptach"), {
             url: "@Html.Raw(Url.Action("RandImage"))?type=" + type + "&row=3&col=15",
-            autoValidate: true,
+            autoValidate: false,
             method: {
                 ready: function (captcha) {
                     if (!captcha.options.autoValidate) {

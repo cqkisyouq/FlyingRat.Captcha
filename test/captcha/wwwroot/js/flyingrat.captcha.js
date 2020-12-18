@@ -1,29 +1,55 @@
 ﻿(function (window, $) {
-    function bindControlSlider(method) {
+    function captchaSlider(method) {
         let func = {
             init: init,
-            destory: function () {}
+            validated: validated,
+            finished: finished,
+            destory: destory,
+            options: {
+                sliderRoot: null,
+                slider: null,
+                background: null,
+                image: null,
+                sliderWidth:0
+            }
         }
+        func.options.sliderImg = method.container.querySelector(".captcha-slider-img");
+        func.options.sliderRoot = method.container.querySelector(".captcha-control-slider");
+        func.options.slider = func.options.sliderRoot.querySelector(".captcha-slider");
+        func.options.sliderBackground = func.options.sliderRoot.querySelector(".captcha-slider-bg");
+        func.options.sliderWidth = func.options.sliderRoot.clientWidth;
+        let isMove = false,controlX=0;
         function init(){
-            window.onmouseup = null;
-            window.onmousemove = null;
-            if (method.options.slider.removeEventListener) {
-                method.options.slider.removeEventListener("mousedown", moveDown);
-            };
-            let $slider = method.options.slider, gapImg = method.options.sliderImg, isMove = false;
-            gapImg.src = method.options.data.isAction ? method.options.data.gap + "?tk=" + method.options.data.tk : method.options.data.gap;
-            gapImg.style.top = getNumberPx(method.options.data.y);
+            destory();
+            let $slider = func.options.slider, gapImg = func.options.sliderImg, isMove = false;
+            gapImg.src = method.data.isAction ? method.data.gap + "?tk=" + method.data.tk : method.data.gap;
+            gapImg.style.top = getNumberPx(method.data.y);
             gapImg.style.display = "block";
             gapImg.onload = function () {
-                method.options.sliderRoot.style.display = "block";
+                func.options.sliderRoot.style.display = "block";
                 $slider.style.width = getNumberPx(gapImg.clientWidth);
-                method.options.sliderWidth = method.options.sliderRoot.clientWidth - $slider.clientWidth;
+                func.options.sliderWidth = func.options.sliderRoot.clientWidth - $slider.clientWidth;
                 $slider.addEventListener("mousedown", moveDown);
+            };
+        }
+        function validated() {
+            method.modal.show();
+        }
+        function finished() {
+            method.modal.hidden();
+        }
+        function destory() {
+            window.onmouseup = null;
+            window.onmousemove = null;
+            show(func.options.sliderRoot, true);
+            show(func.options.sliderImg, true);
+            if (func.options.slider.removeEventListener) {
+                func.options.slider.removeEventListener("mousedown", moveDown);
             };
         }
         function moveDown(event) {
             let ev = event || window.event;
-            method.options.x = ev.clientX;
+            controlX= ev.clientX;
             isMove = true;
             window.onmouseup = moveUp;
             window.onmousemove = move;
@@ -33,20 +59,20 @@
             let ev = event || window.event;
             ev.preventDefault();
             let px = ev.clientX;
-            let mx = px - method.options.x;
+            let mx = px - controlX;
             if (mx <= 0) mx = 0;
-            if (mx > method.options.sliderWidth) mx = method.options.sliderWidth;
-            if (method.options.slider) method.options.slider.style.left = getNumberPx(mx);
-            if (method.options.sliderImg) method.options.sliderImg.style.left = getNumberPx(mx);
-            if (method.options.sliderBackground) method.options.sliderBackground.style.width = getNumberPx(mx + method.options.slider.clientWidth);
+            if (mx > func.options.sliderWidth) mx = method.options.sliderWidth;
+            if (func.options.slider) func.options.slider.style.left = getNumberPx(mx);
+            if (func.options.sliderImg) func.options.sliderImg.style.left = getNumberPx(mx);
+            if (func.options.sliderBackground) func.options.sliderBackground.style.width = getNumberPx(mx + func.options.slider.clientWidth);
         };
         function moveUp(event) {
             if (!isMove) return;
             isMove = false;
-            sliderPoint(parseInt(method.options.sliderImg.style.left), parseInt(method.options.sliderImg.style.top));
-            if (method.options.slider) method.options.slider.style.left = 0;
-            if (method.options.sliderImg) method.options.sliderImg.style.left = 0;
-            if (method.options.sliderBackground) method.options.sliderBackground.style.width = 0;
+            sliderPoint(parseInt(func.options.sliderImg.style.left), parseInt(func.options.sliderImg.style.top));
+            if (func.options.slider) func.options.slider.style.left = 0;
+            if (func.options.sliderImg) func.options.sliderImg.style.left = 0;
+            if (func.options.sliderBackground) func.options.sliderBackground.style.width = 0;
         };
         function sliderPoint(x, y) {
             let result =method.validatePoint(x, y);
@@ -54,56 +80,97 @@
             method.verify(result);
         };
         return func;
-    };
-    function bindControlClick(method) {
+    }
+    function captchaClick(method) {
         let func = {
             init: init,
-            destory: function () {
-                method.options.imgRoot.onclick = null;
+            validated: validated,
+            finished: finished,
+            destory: destory,
+            options: {
+                pointIcon: [],
+                css: {
+                    point: "captcha-point captcha-points-"
+                }
             }
         };
         function init() {
+            destory();
+            if (!method.data.tw) return;
             method.options.imgRoot.onclick = clickPoint;
-            if (!method.options.data.tw) return;
             let div = document.createElement("div");
-            let bg = method.options.isAction ? method.options.data.bgGap + "?tk=" + method.options.data.tk : method.options.data.bgGap;
-            div.style.width = getNumberPx(method.options.data.tw);
-            div.style.height = getNumberPx(method.options.data.th);
+            let bg = method.options.isAction ? method.data.bgGap + "?tk=" + method.data.tk : method.data.bgGap;
+            div.style.width = getNumberPx(method.data.tw);
+            div.style.height = getNumberPx(method.data.th);
             div.style.marginLeft = getNumberPx(5);
             div.style.backgroundImage = "url(" + bg + ")";
-            div.style.backgroundPositionY = getNumberPx(-method.options.data.height);
+            div.style.backgroundPositionY = getNumberPx(-method.data.height);
             method.updateTips(div);
+        }
+        function validated() {
+            method.modal.show();
+        }
+        function finished() {
+            method.modal.hidden();
+            clearIcons();
+        }
+        function destory() {
+            method.options.imgRoot.onclick = null;
+            clearIcons();
         }
         function clickPoint(event) {
             let x = event.layerX, y = event.layerY;
             let result = method.validatePoint(x, y);
             if (result.validate) {
-                let index = method.options.points.length + 1;
+                let index = method.points.length + 1;
                 let max = method.maxPoint;
-                method.drawPoint(x, y, index, function (div, index) {
+                drawPoint(x, y, index, function (div, index) {
                     if (max == index - 1 && method.autoValidate) return;
                     div.style.top = getNumberPx(y - div.clientHeight);
                     div.style.left = getNumberPx(x - (div.clientWidth >> 1));
                     div.onclick = function (event) {
                         if (method.verifying && method.autoValidate) return;
-                        console.debug(index, method.verifying, method.autoValidate)
                         method.clearPoints(index - 1);
+                        clearIcons(index - 1);
                         event.stopPropagation();
                     }
                 })
                 method.addPoint(x, y);
             }
             method.verify(result);
-        };
+        }
+        function drawPoint(x, y, index, callback) {
+            let div = createNumber(x, y, index);
+            method.options.imgRoot.appendChild(div);
+            func.options.pointIcon.push(div);
+            if (isFunction(callback)) callback(div, index);
+            return div;
+        }
+        function createNumber(x, y, number) {
+            number = isNaN(number) ? 0 : parseInt(number);
+            let div = document.createElement("div");
+            div.className = func.options.css.point + number;
+            return div;
+        }
+        function clearIcons(index) {
+            index = isNaN(index) ? 0 : parseInt(index);
+            let icons = func.options.pointIcon;
+            if (icons && !icons.length) return;
+            func.options.pointIcon = icons.slice(0, Math.max(index, 0));
+            icons.slice(Math.min(index, icons.length)).every(function (item) {
+                item.remove();
+                return true;
+            });
+        }
         return func;
     }
+
     function captcha(container, options) {
         function template() {
             let func = {
                 options: {
                     url: null,
                     points: [],
-                    pointIcon: [],
                     method: {
                         setRequestData: null,
                         allowRefresh: null,
@@ -115,72 +182,63 @@
                         setResult: null,
                         ready: null
                     },
-                    x: 0,
-                    y: 0,
                     autoValidate: true,
                     autoRefresh: true,
-                    isMove: false,
                     divImg: null,
                     canvas: null,
-                    slider: null,
-                    sliderBackground: null,
-                    sliderImg: null,
-                    sliderWidth: 0,
                     controlRoot: null,
-                    sliderRoot: null,
                     imgRoot: null,
                     tips: null,
-                    modal: null,
-                    data: null,
-                    css: {
-                        point: "captcha-point captcha-points-"
-                    }
+                    modal: null
                 },
+                tools: {},
                 container: null,
                 isValidate: false,
                 verifying: false
             };
             return func;
-        };
+        }
         let method = new template();
-        method.container = container || method.container;
-        method.options.sliderRoot = method.container.querySelector(".captcha-control-slider");
-        method.options.slider = method.options.sliderRoot.querySelector(".captcha-slider");
-        method.options.sliderBackground = method.options.sliderRoot.querySelector(".captcha-slider-bg");
-        method.options.sliderImg = method.container.querySelector(".captcha-slider-img");
+        method.container = container || document.querySelector("#flyingrat");
         method.options.controlRoot = method.container.querySelector(".captcha-control");
         method.options.canvas = method.container.querySelector("canvas");
         method.options.divImg = method.container.querySelector(".captcha-img");
         method.options.imgRoot = method.container.querySelector(".captcha-control-image");
         method.options.tips = method.container.querySelector(".captcha-control-tips");
         method.options.modal = method.container.querySelector(".captcha-modal");
-        method.options.sliderWidth = method.options.sliderRoot.clientWidth;
         $.extend(method.options, options);
         
         let refbtn = method.container.querySelector(".captcha-control-refresh");
-        if (refbtn) refbtn.onclick = function () {
-            if (isFunction(method.options.method.btn_refresh)) method.options.method.btn_refresh();
-            else autoDrawImage();
-        };
+        if (refbtn) {
+            refbtn.onclick = function () {
+                if (isFunction(method.options.method.btn_refresh)) method.options.method.btn_refresh();
+                else autoDrawImage();
+            };
+            addTool("refresh", refbtn);
+        }
+
         let captchas = (function () {
             let func = {
-                "slidercaptcha": { bindControl: bindControlSlider(method), type: 2, ignoreAutoValidate: true},//sliderCaptcha
-                "pointcaptcha": { bindControl: bindControlClick(method), type: 3, ignoreAutoValidate: false}//pointCaptcha}
+                "slidercaptcha": { bindCaptcha: captchaSlider(method), type: 2, ignoreAutoValidate: true},//sliderCaptcha
+                "pointcaptcha": { bindCaptcha: captchaClick(method), type: 3, ignoreAutoValidate: false}//pointCaptcha}
             };
             return func;
         })();
+        let captchaData = mapData();
+
         defineProperty();
         function defineProperty() {
             Object.defineProperties(method, {
-                "name": { get: function () { return method.options.data.name.toLowerCase() || null; } },
+                "name": { get: function () { return method.data.name.toLowerCase() || null; } },
                 "type": { get: function () { return method.current.type || null } },
+                "data": { get: function () { return captchaData } },
                 "captchas": { get: function () { return captchas; } },
                 "current": { get: function () { return captchas[method.name];} },
                 "points": { get: function () { return method.options.points; } },
                 "clearPoints": { get: function () { return clearPoints; } },
-                "maxPoint": { get: function () { return method.options.data.x || 0; } },
-                "pointIcons": { get: function () { return method.options.pointIcon; } },
-                "bindCaptcha": { get: function () { return setCaptcha; } },
+                "maxPoint": { get: function () { return method.data.x || 0; } },
+                "addCaptcha": { get: function () { return addCaptcha; } },
+                "updateOptions": { get: function () { return updateOptions; } },
                 "mapData": { get: function () { return mapData; } },
                 "mapResult": { get: function () { return mapResult; } },
                 "drawCaptcha": { get: function () { return drawImage; } },
@@ -193,27 +251,29 @@
                 "addPoint": { get: function () { return addPoint; } },
                 "verify": { get: function () { return verify; } },
                 "autoValidate": { get: function () { return isAutoType(); } },
-                "updateTips": { get: function () { return updateTips; } }
+                "updateTips": { get: function () { return updateTips; } },
+                "modal": { get: function () { return { show:showModal,hidden:hiddenModal } } }
             })
         }
 
         function initCaptcha() {
             clearPoints();
-            method.options.x = method.options.y = method.options.sliderWidth = 0;
-            method.options.data = null;
+            destroyCaptcha();
+            captchaData = null;
             method.isValidate = false;
             method.verifying = false;
-            show(method.options.modal, true);
-            show(method.options.sliderRoot, true);
-            show(method.options.sliderImg, true);
+            hiddenModal();
         }
         function destroy() {
-            Object.keys(captchas).forEach(function (key) {
-                captchas[key].bindControl.destory();
-            })
+            destroyCaptcha();
             clearPoints();
             $.extend(method, new template());
             method = null;
+        }
+
+        function addTool(key, tool) {
+            if (!key) return false;
+            method.tools[key] = tool;
         }
 
         function autoDrawImage() {
@@ -223,21 +283,17 @@
         }
         function drawImage(data) {
             if (!data) { autoDrawImage();return;}
+            let canvas = method.options.canvas;
+            canvas == null ? drawDivImage(data) : drawCanvasImage(data);
+        }
+        function drawDivImage(data) {
             initCaptcha();
             if (isFunction(method.options.method.setData)) data = method.options.method.setData(data);
             data = mapData(data);
-            let canvas = method.options.canvas, container = method.container;
-            method.options.data = data;
+            captchaData = data;
+            if (!data.bgGap) return readyCaptcha();
             show(container, false);
-            canvas == null ? drawDivImage(data, callback) : drawCanvasImage(data, callback);
-            function callback() {
-                bindControl();
-                executeReady(method);
-            }
-        };
-        function drawDivImage(data,callback) {
             let div = method.options.divImg;
-            method.options.data = data;
             if (div == null) return;
             let url = data.isAction ? data.bgGap + "?tk=" + data.tk : data.bgGap;
             let image = document.createElement("div");
@@ -273,9 +329,15 @@
             for (let i = 0; i < images.length; i++) {
                 div.appendChild(images[i]);
             }
-            if(isFunction(callback)) callback();
-        };
-        function drawCanvasImage(data, callback) {
+            readyCaptcha();
+        }
+        function drawCanvasImage(data) {
+            initCaptcha();
+            if (isFunction(method.options.method.setData)) data = method.options.method.setData(data);
+            data = mapData(data);
+            captchaData = data;
+            if (!data.bgGap) return readyCaptcha();
+            show(container, false);
             let canvas = method.options.canvas;
             let ctx = canvas.getContext("2d");
             canvas.setAttribute("width", data.width);
@@ -305,30 +367,44 @@
                     ctx.drawImage(image, xxpos, xy * height, curWidth, height, xpos, y * height, curWidth, height);
                     xxpos += curWidth;
                 }
-                if (isFunction(callback)) callback();
+                readyCaptcha();
             }
         }
 
-        function setCaptcha(key, options) {
+        function addCaptcha(key, options) {
             if (!options || typeof options !="object" || !key || !options.init&&!isFunction(options.init) ) return false;
             let type = isNaN(options.type) ? 0 : parseInt(options.type);
-            let captcha = { bindControl: options.init(method), type: type, ignoreAutoValidate:false };
+            let captcha = { bindCaptcha: options.init(method), type: type, ignoreAutoValidate:false };
             method.captchas[key.toLowerCase()] = captcha;
             return captcha;
         }
-        function bindControl() {
+        function updateOptions(key, options) {
+            let captcha = method.captchas[key.toLowerCase()];
+            if (!captcha) return false;
+            $.extend(captcha.options, options);
+            return captcha;
+        }
+        function destroyCaptcha(){
+            Object.keys(captchas).forEach(function (key) {
+                captchas[key].bindCaptcha.destory();
+            })
+        }
+        function readyCaptcha() {
+            initBindCaptcha();
+            executeReady(method);
+        }
+        function initBindCaptcha() {
             let span = document.createElement("span");
-            span.innerText = method.options.data.tips;
+            span.innerText = method.data.tips;
             updateTips(span, true);
-            let control = method.captchas[method.name];
-            if (control) control.bindControl.init();
+            let captcha = method.captchas[method.name];
+            if (captcha) excuteFunc(captcha.bindCaptcha.init);
         }
         function executeReady(captcha) {
-            if (captcha&&isFunction(captcha.options.method.ready)) {
-                captcha.options.method.ready(captcha);
-            }
+            if (captcha && isFunction(captcha.options.method.ready)) captcha.options.method.ready(captcha);
         }
         function updateTips(el, isNew) {
+            if (!method.options.tips) return;
             if (isNew) method.options.tips.innerHTML = "";
             method.options.tips.appendChild(el)
         }
@@ -350,42 +426,21 @@
             method.options.points.push(point);
             return point;
         }
-        function drawPoint(x, y, index, callback) {
-            let div = createNumber(x, y, index);
-            method.options.imgRoot.appendChild(div);
-            method.options.pointIcon.push(div);
-            if (isFunction(callback)) callback(div, index);
-            return div;
-        }
+        
+
         function clearPoints(index) {
             index = isNaN(index) ? 0 : parseInt(index);
             if (!method) return;
-            let points = method.options.points, icons = method.options.pointIcon;
+            let points = method.options.points;
             method.options.points = points.slice(0, Math.max(index, 0));
-            if (method.options.pointIcon && !method.options.pointIcon.length) return;
-            method.options.pointIcon = icons.slice(0, Math.max(index, 0));
-            icons.slice(Math.min(index, icons.length)).every(function (item) {
-                item.remove();
-                return true;
-            });
         }
         function delayedClearPoints(second, callback) {
-            setTimeout(function () {
-                clearPoints();
-                if (isFunction(callback)) callback();
-            }, parseInt(second) * 1000)
-        }
-        function createNumber(x, y, number) {
-            number = isNaN(number) ? 0 : parseInt(number);
-            let div = document.createElement("div");
-            div.className = method.options.css.point + number;
-            return div;
+            delayedFuc(second, clearPoints, callback);
         }
 
         function verify(custom) {
             if (custom.custom || method.isValidate || method.maxPoint != method.points.length) return;
             method.verifying = true;
-            show(method.options.modal,false);
             if (isFunction(method.options.method.validate)) {
                 let isvalid = method.options.method.validate(verified,method);
                 if (isvalid) return;
@@ -394,7 +449,7 @@
             if (method.current.type != 3) requestVerfiy();
         }
         function requestVerfiy() {
-            let data = method.options.data, points = method.points;
+            let data = method.data, points = method.points;
             if (method.maxPoint != points.length) return;
             if (!method.verifying) method.verifying = true;
             let redata = { points: points, tk: data.tk };
@@ -408,15 +463,17 @@
         }
         function verified(data) {
             if (!method) return;
-            if (isFunction(method.options.method.setResult)) data = method.options.method.setResult(data);
-            data = mapResult(data);
+            let udata = null;
+            if (isFunction(method.options.method.setResult)) udata = method.options.method.setResult(data);
+            data =mapResult( udata || data);
             method.isValidate = data.succeed;
-            if (data.refresh && (method.options.autoRefresh || isFunction(method.options.allowRefresh) && method.options.allowRefresh(data,method))){
-                autoDrawImage();
+            excuteFunc(method.current.bindCaptcha.validated)
+            if (data.refresh && (method.options.autoRefresh || isFunction(method.options.allowRefresh) && method.options.allowRefresh(data, method))) {
+                delayedFuc(1, autoDrawImage);
                 return;
             }
             if (isFunction(method.options.method.validated)) method.options.method.validated(data);
-            delayedClearPoints(1, function () { if (!method) return; method.verifying = false; show(method.options.modal, true);});
+            delayedClearPoints(1, function () { if (!method) return; method.verifying = false; excuteFunc(method.current.bindCaptcha.finished)});
         }
 
         function mapResult(data) {
@@ -430,12 +487,24 @@
             return innerData;
         }
 
+        function showModal() {
+            show(method.options.modal, false);
+        }
+        function hiddenModal() {
+            show(method.options.modal, true);
+        }
         function isAutoType() {
             return !method.current.ignoreAutoValidate && method.options.autoValidate;
         }
         return method;
-    };
+    }
 
+    function delayedFuc(second, func, callback) {
+        setTimeout(function () {
+            if (isFunction(func)) func();
+            if (isFunction(callback)) callback();
+        }, parseInt(second) * 1000)
+    }
     function show(element, hidden) {
         if (!element) return;
         element.style.display = !!hidden ? "none" : "block";
@@ -445,6 +514,9 @@
         return parseInt(number) + "px";
     }
 
+    function excuteFunc(func) {
+        if (isFunction(func)) func();
+    }
     function isFunction(func) {
         if (func && typeof func === "function") return true;
         return false;

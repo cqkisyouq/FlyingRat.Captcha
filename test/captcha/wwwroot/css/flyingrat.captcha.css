@@ -99,6 +99,21 @@
     background-color:#000;
     opacity:.5;
 }
+.captcha-modal-body{
+    display:flex;
+    height:100%;
+    justify-content:center;
+    align-content:center;
+    align-items:center;
+}
+.captcha-icon-refresh {
+    background-image: url("/Image/captcha_icon.png");
+    background-position-y: -362px;
+    width: 32px;
+    height: 35px;
+    animation:captcha-icon-refresh .7s infinite;
+}
+
 .captcha-slider-icon {
     background-image: url("/Image/captcha_icon.png");
     width:15px;
@@ -148,4 +163,27 @@
 
 .captcha-points-4 {
     background-position-y: -507px;
+}
+
+/** animation **/
+@keyframes captcha-icon-refresh {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    25% {
+        -webkit-transform: rotate(90deg);
+    }
+
+    50% {
+        -webkit-transform: rotate(180deg);
+    }
+
+    75% {
+        -webkit-transform: rotate(270deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
 }
