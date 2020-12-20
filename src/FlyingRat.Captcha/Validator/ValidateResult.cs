@@ -28,7 +28,13 @@ namespace FlyingRat.Captcha.Validator
         {
             this.Succeed = succeed;
         }
-
+        public ValidateResult NotAllow()
+        {
+            AllowValidate = false;
+            Token = null;
+            Succeed = false;
+            return this;
+        }
         public static ValidateResult Failed
         {
             get { return new ValidateResult(); }

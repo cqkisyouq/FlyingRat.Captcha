@@ -20,6 +20,6 @@ namespace FlyingRat.Captcha.Validator
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public Point Point() => new Point(X, Y);
+        public Point Point { get { return new Point(X, Y); } }
     }
 }

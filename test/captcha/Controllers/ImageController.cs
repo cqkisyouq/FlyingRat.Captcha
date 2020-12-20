@@ -4,6 +4,7 @@ using FlyingRat.Captcha.Context;
 using FlyingRat.Captcha.Extensions;
 using FlyingRat.Captcha.Interface;
 using FlyingRat.Captcha.Validator;
+using FlyingRat.Captcha.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using SixLabors.ImageSharp;
@@ -71,13 +72,13 @@ namespace Captcha.Controllers
             return File(ms.ToArray(), "image/png");
         }
 
-        public async ValueTask<IActionResult> Validate(ValidateModel model,string tk)
+        public async ValueTask<IActionResult> Validate([FromBody]CaptchaVerifyModel model)
         {
-            var data = _memoryCache.Get<CaptchaCacheModel>(cacheKey + tk);
+            var data = _memoryCache.Get<CaptchaCacheModel>(cacheKey + model.TK);
             if (data == null) return Json(ValidateResult.Failed);
-            var context = new CaptchaValidateContext(new ValidateModel(data.Points), model,data.Validate);
+            var context = new CaptchaValidateContext(new ValidateModel(data.Points), model.ToValidateModel(),data.Validate);
             data.Validate =await _captchaManager.Validate(data.Name, context,data.Options);
-            return Json(data.Validate?.ToValidateModel());
+            return Json(data.Validate?.ToViewModel());
         }
     }
 }

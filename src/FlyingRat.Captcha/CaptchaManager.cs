@@ -1,15 +1,10 @@
-﻿using FlyingRat.Captcha.Interface;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using FlyingRat.Captcha.Validator;
+﻿using FlyingRat.Captcha.Configuration;
 using FlyingRat.Captcha.Context;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp;
+using FlyingRat.Captcha.Interface;
+using FlyingRat.Captcha.Validator;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
-using SixLabors.ImageSharp.Processing;
-using FlyingRat.Captcha.Configuration;
 
 namespace FlyingRat.Captcha
 {
@@ -45,11 +40,11 @@ namespace FlyingRat.Captcha
         {
             var validator = _validatorFactory.Create(captcha);
             if (validator == null) return new ValueTask<ValidateResult>(ValidateResult.Failed);
-            if (!validator.AllowValidate(context, options)) return new ValueTask<ValidateResult>(context.GetResult());
+            if (!validator.AllowValidate(context, options)) return new ValueTask<ValidateResult>(context.GetResult().NotAllow());
 
             var handlers = _validateHandlerFactory?.Create(captcha);
             handlers?.Handing(async (handler, context) =>await handler.Validating(context,options), context);
-            if (!validator.AllowValidate(context)) return new ValueTask<ValidateResult>(context.GetResult());
+            if (!validator.AllowValidate(context)) return new ValueTask<ValidateResult>(context.GetResult().NotAllow());
 
             validator.Validate(context,options);
             var result = context.GetResult();
@@ -79,7 +74,7 @@ namespace FlyingRat.Captcha
             var rdImage =captcha?.Captcha(options);
             var model = await rdImage.Value;
             if (model.Token == null) model.Token = _token.Create();
-            model.Options = options;
+            if(model.Options==null) model.Options = options?.Clone() as BaseCaptchaOptions;
             if (handlers?.Any() ?? false)
             {
                 context.Captcha = model;

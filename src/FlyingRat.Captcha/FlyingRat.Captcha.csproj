@@ -1,14 +1,26 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+	<TargetFramework>netstandard2.1</TargetFramework>
+	<Copyright>Copyright 2020 (c) FlyingRat. All rights reserved.</Copyright>
+	<Description></Description>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<PackageProjectUrl>https://github.com/cqkisyouq/FlyingRat.Captcha</PackageProjectUrl>
+	<Version>1.0.0-beta1</Version>
+	<AssemblyVersion>1.0.0.0</AssemblyVersion>
+	<FileVersion>1.0.0.0</FileVersion>
+	<PackageTags>FlyingRat</PackageTags>
+	<Authors>FlyingRat</Authors>
+	<IsTool>true</IsTool>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta11" />
-    <PackageReference Include="System.Text.Json" Version="5.0.0" />
+	<None Include="content\**" Pack="True" PackagePath="wwwroot\js" />
   </ItemGroup>
-
+  <ItemGroup>
+	<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
+	<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta11" />
+	<PackageReference Include="System.Text.Json" Version="5.0.0" />
+  </ItemGroup>
 </Project>

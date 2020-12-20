@@ -111,9 +111,25 @@
     background-position-y: -362px;
     width: 32px;
     height: 35px;
-    animation:captcha-icon-refresh .7s infinite;
+    display: none;
+    animation: captcha-icon-refresh .7s infinite;
 }
-
+.captcha-icon-succeed {
+    background-image: url("/Image/captcha_icon.png");
+    background-position-y: -60px;
+    width: 20px;
+    height: 20px;
+    transform: scale(2);
+    display: none;
+}
+.captcha-icon-failed {
+    background-image: url("/Image/captcha_icon.png");
+    background-position-y: -96px;
+    width: 15px;
+    height: 15px;
+    transform: scale(2);
+    display:none;
+}
 .captcha-slider-icon {
     background-image: url("/Image/captcha_icon.png");
     width:15px;

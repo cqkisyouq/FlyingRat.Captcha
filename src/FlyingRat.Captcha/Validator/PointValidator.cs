@@ -28,7 +28,7 @@ namespace FlyingRat.Captcha.Validator
             model.Succeed = false;
             var sourcePoints = context.Source.Points;
             var points = context.Validate.Points;
-            if (points?.Any() ?? true || points.Count != sourcePoints?.Count) return model;
+            if (!points?.Any() ?? true || points.Count != sourcePoints?.Count) return model;
 
             var offset =options?.Offset ?? _options.Offset;
             model.Succeed = true;
@@ -47,6 +47,7 @@ namespace FlyingRat.Captcha.Validator
                 model.Succeed = false;
                 break;
             }
+            model.AllowValidate = !model.Succeed;
             return model;
         }
     }

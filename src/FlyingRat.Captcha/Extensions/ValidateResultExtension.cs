@@ -8,7 +8,7 @@ namespace FlyingRat.Captcha.Extensions
 {
     public static class ValidateResultExtension
     {
-        public static ValidateViewModel ToValidateModel(this ValidateResult captcha)
+        public static ValidateViewModel ToViewModel(this ValidateResult captcha)
         {
             if (captcha == null) return new ValidateViewModel();
             var model = new ValidateViewModel();

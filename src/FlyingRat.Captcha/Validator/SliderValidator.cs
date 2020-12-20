@@ -25,7 +25,6 @@ namespace FlyingRat.Captcha.Validator
             var model = context.GetResult();
             model.IsValidate = true;
             model.Count++;
-            model.AllowValidate = true;
             model.Succeed = false;
 
             if (context.Validate?.Points?.Count != 1) return model;
@@ -38,6 +37,7 @@ namespace FlyingRat.Captcha.Validator
             if (x >= 0 && x <= range && y >= 0 && y <= range)
             {
                 model.Succeed = true;
+                model.AllowValidate = false;
             }
             return model;
         }

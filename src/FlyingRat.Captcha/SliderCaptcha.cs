@@ -6,10 +6,8 @@ using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FlyingRat.Captcha
@@ -66,7 +64,8 @@ namespace FlyingRat.Captcha
                 .AddColumn(col).AddRow(row)
                 .AddType(Type).AddName(Name)
                 .AddTips("向右拖动滑块填充拼图")
-                .AddPoints(new List<CaptchaPoint>(1) { point });
+                .AddPoints(new List<CaptchaPoint>(1) { point })
+                .AddOptions(option);
             return _captchaImageBuilder.Build();
         }
     }

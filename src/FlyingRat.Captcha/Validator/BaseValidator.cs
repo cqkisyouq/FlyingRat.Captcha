@@ -16,6 +16,7 @@ namespace FlyingRat.Captcha.Validator
         public virtual bool AllowValidate(CaptchaValidateContext context, BaseCaptchaOptions options = null)
         {
             var result = context.GetResult();
+            if (!result.AllowValidate) return result.AllowValidate;
             result.AllowValidate = options==null? result.Count<Options?.Validate_Max: result.Count < options.Validate_Max;
             return result.AllowValidate;
         }

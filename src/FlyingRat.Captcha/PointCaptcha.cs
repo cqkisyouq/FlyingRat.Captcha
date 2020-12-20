@@ -6,10 +6,8 @@ using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FlyingRat.Captcha
@@ -88,7 +86,7 @@ namespace FlyingRat.Captcha
                 .AddType(Type).AddName(Name)
                 .AddTips("请依次点击")
                 .AddTipWidth(xpos).AddTipHeight(height)
-                .AddPoints(points);
+                .AddPoints(points).AddOptions(option);
             return _captchaImageBuilder.Build();
         }
     }

@@ -14,6 +14,10 @@ namespace FlyingRat.Captcha.Validator
         {
             Points = points;
         }
+        public ValidateModel(string code)
+        {
+            this.Code = code;
+        }
         public List<CaptchaPoint> Points { get; set; }
         public string Code { get; set; }
     }

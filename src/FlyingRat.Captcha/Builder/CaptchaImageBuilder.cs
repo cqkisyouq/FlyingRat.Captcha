@@ -1,4 +1,5 @@
-﻿using FlyingRat.Captcha.Validator;
+﻿using FlyingRat.Captcha.Configuration;
+using FlyingRat.Captcha.Validator;
 using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
@@ -89,7 +90,11 @@ namespace FlyingRat.Captcha.Builder
             return this;
         }
 
-
+        public CaptchaImageBuilder AddOptions(BaseCaptchaOptions options)
+        {
+            Captcha.Value.Options = options.Clone() as BaseCaptchaOptions;
+            return this;
+        }
         public CaptchaImageBuilder AddToken(string token)
         {
             Captcha.Value.Token = token;

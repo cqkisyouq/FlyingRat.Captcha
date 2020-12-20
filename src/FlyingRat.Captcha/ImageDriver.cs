@@ -74,7 +74,7 @@ namespace FlyingRat.Captcha
                 {
                     var imgData = images[i];
                     using var img =new Image<Rgba32>(imgData.Point.Width, imgData.Point.Height);
-                    Copy(cloneSource, imgData.Point.Point(), img);
+                    Copy(cloneSource, imgData.Point.Point, img);
                     var xx = i % col;
                     var xy = i / col;
                     if (xx == 0) xpos = 0;

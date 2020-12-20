@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FlyingRat.Captcha.Configuration
 {
-    public class BaseCaptchaOptions
+    public class BaseCaptchaOptions:ICloneable
     {
         /// <summary>
         /// 乱序图片每分行割列数
@@ -26,5 +26,10 @@ namespace FlyingRat.Captcha.Configuration
         /// 最大验证次数
         /// </summary>
         public int Validate_Max { get; set; } = 3;
+
+        public virtual object Clone()
+        {
+            return this.MemberwiseClone();
+        }
     }
 }
