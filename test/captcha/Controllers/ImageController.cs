@@ -74,6 +74,7 @@ namespace Captcha.Controllers
 
         public async ValueTask<IActionResult> Validate([FromBody]CaptchaVerifyModel model)
         {
+            if (model == null) return Json(ValidateResult.Failed);
             var data = _memoryCache.Get<CaptchaCacheModel>(cacheKey + model.TK);
             if (data == null) return Json(ValidateResult.Failed);
             var context = new CaptchaValidateContext(new ValidateModel(data.Points), model.ToValidateModel(),data.Validate);

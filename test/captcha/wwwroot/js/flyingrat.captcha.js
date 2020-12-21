@@ -6,7 +6,8 @@
             validate: validate,
             validated: validated,
             finished: finished,
-            destory: destory,
+            exit: destory,
+            allowVerify: canValidate,
             jsonData: getRequestData,
             hasShow:true,
             options: {
@@ -55,9 +56,7 @@
         function finished() {
             method.modal.hidden();
             method.icon.hidden();
-            if (func.options.slider) func.options.slider.style.left = 0;
-            if (func.options.sliderImg) func.options.sliderImg.style.left = 0;
-            if (func.options.sliderBackground) func.options.sliderBackground.style.width = 0;
+            initSlider();
         }
         function destory() {
             window.onmouseup = null;
@@ -67,6 +66,7 @@
             if (func.options.slider.removeEventListener) {
                 func.options.slider.removeEventListener("mousedown", moveDown);
             };
+            initSlider();
         }
         function getRequestData() {
             if (method.maxPoint == method.points.length) {
@@ -101,12 +101,17 @@
         };
         function sliderPoint(x, y) {
             if (!x) return;
-            let result =method.validatePoint(x, y);
-            if (result.validate) method.addPoint(x, y);
-            if (method.maxPoint != method.points.length) return;
-            method.validate(result);
-        };
-       
+            if (method.validatePoint(x, y)) method.addPoint(x, y);
+            if (canValidate) method.validate();
+        }
+        function canValidate() {
+            return method.maxPoint == method.points.length;
+        }
+        function initSlider() {
+            if (func.options.slider) func.options.slider.style.left = 0;
+            if (func.options.sliderImg) func.options.sliderImg.style.left = 0;
+            if (func.options.sliderBackground) func.options.sliderBackground.style.width = 0;
+        }
         return func;
     }
     function captchaClick(method) {
@@ -116,13 +121,19 @@
             validate: validate,
             validated: validated,
             finished: finished,
-            destory: destory,
+            exit: destory,
             jsonData: getRequestData,
+            allowVerify: canValidate,
             hasShow: true,
+            submit:null,
             options: {
                 pointIcon: [],
+                callback: {
+                    submit: null
+                },
                 css: {
-                    point: "captcha-point captcha-points-"
+                    point: "captcha-point captcha-points-",
+                    submit:"captcha-manual-submit"
                 }
             }
         };
@@ -133,7 +144,7 @@
             if (!method.data.tw) return;
             method.modal.show();
             method.showIcon(method.options.icon.refresh,false);
-            method.options.imgRoot.onclick = clickPoint;
+            bindClick();
             let div = document.createElement("div");
             let bg = method.options.isAction ? method.data.bgGap + "?tk=" + method.data.tk : method.data.bgGap;
             div.style.width = getNumberPx(method.data.tw);
@@ -161,7 +172,9 @@
         }
         function destory() {
             method.options.imgRoot.onclick = null;
+            if (!method.autoValidate && !!func.submit) show(func.submit, true);
             clearIcons();
+            func.submit = null;
         }
         function getRequestData() {
             if (method.maxPoint == method.points.length) {
@@ -172,8 +185,7 @@
 
         function clickPoint(event) {
             let x = event.layerX, y = event.layerY;
-            let result = method.validatePoint(x, y);
-            if (result.validate) {
+            if (method.validatePoint(x, y)) {
                 let index = method.points.length + 1;
                 let max = method.maxPoint;
                 drawPoint(x, y, index, function (div, index) {
@@ -189,8 +201,13 @@
                 })
                 method.addPoint(x, y);
             }
-            if (method.points.length != method.maxPoint) return;
+            if (canValidate) submitData();
+        }
+        function submitData(result) {
             method.validate(result);
+        }
+        function canValidate() {
+            return method.points.length == method.maxPoint;
         }
         function drawPoint(x, y, index, callback) {
             let div = createNumber(x, y, index);
@@ -214,6 +231,13 @@
                 item.remove();
                 return true;
             });
+        }
+        function bindClick() {
+            method.options.imgRoot.onclick = clickPoint;
+            func.submit = method.container.querySelector("." + func.options.css.submit);
+            if (!func.submit) return;
+            if (!method.autoValidate) show(func.submit, false);
+            func.submit.onclick = submitData;
         }
         return func;
     }
@@ -300,6 +324,8 @@
                 "drawCaptcha": { get: function () { return drawImage; } },
                 "drawPoint": { get: function () { return drawPoint;}},
                 "destroy": { get: function () { return destroy; } },
+                "destroyCurrent": { get: function () { return destoryCaptcha; } },
+                "InvokeCaptcha": { get: function () { return InvokeCaptcha; } },
                 "refresh": { get: function () { return autoDrawImage; } },
                 "validate": { get: function () { return verify; } },
                 "validated": { get: function () { return verified; } },
@@ -308,6 +334,7 @@
                 "createJsonData": { get: function () { return createJson; } },
                 "delayedFunction": { get: function () { return delayedFuc; } },
                 "autoValidate": { get: function () { return isAutoType(); } },
+                "autoRefresh": { get: function () { return method.options.autoRefresh; } },
                 "updateTips": { get: function () { return updateTips; } },
                 "show": { get: function () { return rootShow; } },
                 "hidden": { get: function () { return rootHidden; } },
@@ -326,8 +353,14 @@
             method.icon.hidden();
             hiddenModal();
         }
+
+        function destoryCaptcha() {
+            if (!method.current) return;
+            InvokeCaptcha("exit");
+        }
+
         function destroy() {
-            InvokeCaptcha("destory");
+            InvokeCaptcha("exit", false);
             clearPoints();
             method = null;
         }
@@ -339,6 +372,7 @@
 
         function autoDrawImage() {
             if (!method.options.url) return;
+            destoryCaptcha();
             if (isFunction(method.options.refreshCaptcha)) return excuteFunc(method.options.refreshCaptcha);
             try {
                 let ajax = Ajax();
@@ -346,7 +380,6 @@
                     drawImage(data);
                 })
             } catch (e) {
-
             }
         }
         function drawImage(data) {
@@ -459,8 +492,10 @@
             mapObject(options, captcha.options);
             return captcha;
         }
-        function InvokeCaptcha(name) {
+        function InvokeCaptcha(name, single) {
             if (typeof name != "string") return;
+            single = isNaN(single) ? true : !!single;
+            if (single && !!method.current) return excuteFunc(method.current.bindCaptcha[name]);
             Object.keys(captchas).forEach(function (key) {
                 excuteFunc(captchas[key].bindCaptcha[name]);
             })
@@ -486,38 +521,28 @@
         }
 
         function validatePoint(x, y) {
-            let custom = { custom: false, validate: false };
-            if (method.verifying && method.autoValidate) return custom;
             if (isFunction(method.options.method.validatePoint)) {
-                let result = method.options.method.validatePoint(x, y,method);
-                custom.custom =true;
-                custom.validate = !!result;
+                return !!method.options.method.validatePoint(x, y,method);
             } else {
-                custom.validate = method.points.length < method.maxPoint;
+                return method.points.length < method.maxPoint;
             }
-            return custom;
         }
         function addPoint(x, y) {
             let point = { x: x, y: y };
             method.options.points.push(point);
             return point;
         }
-        
-
         function clearPoints(index) {
             index = isNaN(index) ? 0 : parseInt(index);
             if (!method) return;
             let points = method.options.points;
             method.options.points = points.slice(0, Math.max(index, 0));
         }
-        function delayedClearPoints(second, callback) {
-            delayedFuc(second, clearPoints, callback);
-        }
 
-        function verify(custom) {
-            if (custom&&custom.custom) return;
+        function verify() {
+            if (!InvokeCaptcha("allowVerify")) return;
             method.verifying = true;
-            excuteFunc(method.current.bindCaptcha.validate)
+            excuteFunc("validate");
             if (isFunction(method.options.method.validate)) {
                 let isValid = method.options.method.validate(verified, method);
                 if (isValid) return;
@@ -634,7 +659,8 @@
     }
 
     function excuteFunc(func,arg) {
-        if (isFunction(func)) func(arg);
+        if (!isFunction(func)) return;
+        return func(arg);
     }
     function isFunction(func) {
         if (func && typeof func === "function") return true;
@@ -651,7 +677,7 @@
             if (!request) return;
             async = isNaN(async) ? true : async;
             request.open("GET", url, !!async);
-            request.setRequestHeader("Content-Type", "application/json;");
+            request.setRequestHeader("Content-Type", "application/json");
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200 || request.status == 304) {
                     // 从服务器获得数据 
@@ -666,7 +692,7 @@
             if (!request) return;
             async = isNaN(async) ? true : async;
             request.open("POST", url, !!async);
-            request.setRequestHeader("Content-Type", "application/json;");
+            request.setRequestHeader("Content-Type", "application/json");
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200 || request.status == 304) {
                     // 从服务器获得数据 

@@ -46,11 +46,9 @@
                 <div class="captcha-icon-succeed"></div>
                 <div class="captcha-icon-failed"></div>
             </div>
-         </div>
-            <div id="btn_block" style="display:none;">
-                <button id="btn_ok" class="btn-outline-primary btn-block mt-1" style="height:40px;">确定</button>
-            </div>
         </div>
+       <button class="btn-outline-primary btn-block mt-1 captcha-manual-submit" style="height:40px;">确定</button>
+    </div>
 </div>
 <div style="display:flex;">
     <div>
@@ -79,15 +77,29 @@
         var cap, divCap;
         function validate(callback, captcha) {
             if (captcha.autoValidate) return false;
-            $.post(captcha.data.validate, { points: captcha.points, tk: captcha.data.tk, type: captcha.current.type }, function (data) {
-                console.debug("验证结果：", data);
-                callback(data);
-            });
+            $.ajax({
+                url: captcha.data.validate,
+                method: "post",
+                contentType: "application/json",
+                data: JSON.stringify({ points: captcha.points, tk: captcha.data.tk, type: captcha.current.type }),
+                success: function (data) {
+                    console.debug("验证结果：", data);
+                    callback(data);
+                }
+            })
             return true;
         }
+
         function validated(data,callback,captcha) {
             console.debug("拿到验证结果", data)
+
+            //callback：调用当前的验的实现的 finished 方法，当前验证码的后续处理
             captcha.delayedFunction(0.5, callback);
+
+            if (data.success) console.debug("验证正确，获取校验 token：", data.token);
+
+            //autoRefresh：false  需要手动刷新验证码
+            if (!captcha.autoRefresh && data.refresh) captcha.drawCaptcha();
         }
     function LoadImage(type) {
         reType = type;
@@ -98,20 +110,22 @@
             autoRefresh: false,
             method: {
                 ready: function (captcha) {
-                    if (!captcha.options.autoValidate) {
-                        $("#btn_block").show();
-                        $("#btn_ok").unbind("click").click("click", function () {
-                            captcha.validate();
-                    })
-                    }
+                    //第一次调用验证码显示时执行
+                    //if (!captcha.options.autoValidate) {
+                    //    $("#btn_block").show();
+                    //    $("#btn_ok").unbind("click").click("click", function () {
+                    //        captcha.validate();
+                    //    })
+                    //}
                 },
+                validate:validate,
                 validated: validated
             }
         });
         divCap = new captcha(document.querySelector("#divCaptach"), {
             url: "@Html.Raw(Url.Action("RandImage"))?type=" + type + "&row=2&col=15",
             method: { validate: validate, validated: validated},
-            autoValidate: true,
+            autoValidate: false,
             autoRefresh:false
         });
         cap.drawCaptcha();
