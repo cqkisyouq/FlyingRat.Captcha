@@ -17,7 +17,7 @@ namespace FlyingRat.Captcha.Configuration
         /// <summary>
         /// 验证偏移范围
         /// </summary>
-        public virtual int Offset { get; set; } = 1;
+        public virtual int Offset { get; set; } = 2;
         /// <summary>
         /// 提示
         /// </summary>

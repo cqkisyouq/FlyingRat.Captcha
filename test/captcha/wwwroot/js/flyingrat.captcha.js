@@ -1,6 +1,102 @@
 ﻿(function (window, $) {
-    function captchaSlider(method) {
+
+    /* --------------- template ---------------*/
+    function template() {
         let func = {
+            options: {
+                url: null,
+                points: [],
+                method: {
+                    setRequestData: null,
+                    allowRefresh: null,
+                    validatePoint: null,
+                    validate: null,
+                    validated: null,
+                    setData: null,
+                    setResult: null,
+                    ready: null,
+                    refreshCaptcha: null
+                },
+                autoValidate: true,
+                autoRefresh: true,
+                divImg: null,
+                canvas: null,
+                controlRoot: null,
+                imgRoot: null,
+                tips: null,
+                modal: null,
+                icon: {
+                    refresh: "captcha-icon-refresh",
+                    succeed: "captcha-icon-succeed",
+                    failed: "captcha-icon-failed"
+                }
+            },
+            container: null,
+            succeed: false,
+            verifying: false
+        };
+        return func;
+    }
+    function captchaTemplate() {
+        let func = {
+            before: noneFunc,
+            init: noneFunc,
+            validate: noneFunc,
+            validated: noneFunc,
+            finished: noneFunc,
+            exit: noneFunc,
+            allowVerify: noneFunc,
+            jsonData: noneFunc,
+            hasShow: true,
+            options: null
+        }
+        return func;
+    }
+    function resultTemplate() {
+        let func = { token: null, succeed: false, refresh: false };
+        return func;
+    }
+    function dataTemplate() {
+        let func = {
+            name: null,
+            index: null,
+            change: null,
+            width: 0,
+            height: 0,
+            col: 0,
+            row: 0,
+            x: 0,
+            y: 0,
+            tk: null,
+            bgGap: null,
+            gap: null,
+            full: null,
+            validate: null,
+            isAction: false,
+            tips: null,
+            tw: 0,
+            th: 0,
+            type: 0
+        };
+        return func;
+    }
+    function toolTemplate() {
+        let func = {
+            init: noneFunc,
+            options: {
+                callback: noneFunc
+            },
+            delete:noneFunc,
+            element: null,
+            name:null
+        }
+        return func;
+    }
+    /* -----------------------------------------*/
+
+    /* --------------- create catpcha ---------------*/
+    function captchaSlider(method) {
+        let func = mapObject({
             before: before,
             init: init,
             validate: validate,
@@ -8,16 +104,16 @@
             finished: finished,
             exit: destory,
             allowVerify: canValidate,
-            jsonData: getRequestData,
-            hasShow:true,
+            jsonData: jsonData,
+            hasShow: true,
             options: {
                 sliderRoot: null,
                 slider: null,
                 background: null,
                 image: null,
-                sliderWidth:0
+                sliderWidth: 0
             }
-        }
+        }, new captchaTemplate());
         func.options.sliderImg = method.container.querySelector(".captcha-slider-img");
         func.options.sliderRoot = method.container.querySelector(".captcha-control-slider");
         func.options.slider = func.options.sliderRoot.querySelector(".captcha-slider");
@@ -29,7 +125,10 @@
         }
         function init() {
             method.modal.show();
-            method.showIcon(method.options.icon.refresh, false);
+            let span = document.createElement("span");
+            span.innerText = method.data.tips;
+            method.updateTips(span, true);
+            method.icon.show(method.options.icon.refresh);
             let slider = func.options.slider, gapImg = func.options.sliderImg;
             controlX = 0; isMove = false;
             gapImg.src = method.data.isAction ? method.data.gap + "?tk=" + method.data.tk : method.data.gap;
@@ -41,7 +140,7 @@
                 func.options.sliderWidth = func.options.sliderRoot.clientWidth - slider.clientWidth;
                 slider.addEventListener("mousedown", moveDown);
                 delayedFuc(0.5, function () {
-                    method.showIcon(method.options.icon.refresh, true);
+                    method.icon.hidden(method.options.icon.refresh);
                     excuteFunc(method.modal.hidden);
                 });
             };
@@ -50,8 +149,8 @@
             method.modal.show();
         }
         function validated() {
-            if (method.succeed) return method.showIcon(method.options.icon.succeed, false);
-            method.showIcon(method.options.icon.failed, false);
+            let icon = method.succeed ? method.options.icon.succeed : method.options.icon.failed;
+            method.icon.show(icon);
         }
         function finished() {
             method.modal.hidden();
@@ -61,23 +160,20 @@
         function destory() {
             window.onmouseup = null;
             window.onmousemove = null;
-            show(func.options.sliderRoot, true);
-            show(func.options.sliderImg, true);
+            show(func.options.sliderRoot, false);
+            show(func.options.sliderImg, false);
             if (func.options.slider.removeEventListener) {
                 func.options.slider.removeEventListener("mousedown", moveDown);
             };
             initSlider();
         }
-        function getRequestData() {
-            if (method.maxPoint == method.points.length) {
-                return method.createJsonData(true,{ points: method.points,tk:method.data.tk });
-            }
-            return method.createJsonData();
+        function jsonData() {
+            return method.createJsonData(true, { points: method.points, tk: method.data.tk });
         }
 
         function moveDown(event) {
             let ev = event || window.event;
-            controlX= ev.clientX;
+            controlX = ev.clientX;
             isMove = true;
             window.onmouseup = moveUp;
             window.onmousemove = move;
@@ -115,36 +211,41 @@
         return func;
     }
     function captchaClick(method) {
-        let func = {
+        let func = mapObject({
             before: before,
             init: init,
             validate: validate,
             validated: validated,
             finished: finished,
             exit: destory,
-            jsonData: getRequestData,
+            jsonData: jsonData,
             allowVerify: canValidate,
             hasShow: true,
-            submit:null,
             options: {
+                submit: null,
                 pointIcon: [],
                 callback: {
                     submit: null
                 },
                 css: {
                     point: "captcha-point captcha-points-",
-                    submit:"captcha-manual-submit"
+                    submit: "captcha-manual-submit"
                 }
             }
-        };
+        }, new captchaTemplate());
         function before() {
             destory();
         }
         function init() {
             if (!method.data.tw) return;
             method.modal.show();
-            method.showIcon(method.options.icon.refresh,false);
+            method.icon.show(method.options.icon.refresh);
             bindClick();
+
+            let span = document.createElement("span");
+            span.innerText = method.data.tips;
+            method.updateTips(span, true);
+
             let div = document.createElement("div");
             let bg = method.options.isAction ? method.data.bgGap + "?tk=" + method.data.tk : method.data.bgGap;
             div.style.width = getNumberPx(method.data.tw);
@@ -153,8 +254,9 @@
             div.style.backgroundImage = "url(" + bg + ")";
             div.style.backgroundPositionY = getNumberPx(-method.data.height);
             method.updateTips(div);
+
             delayedFuc(0.5, function () {
-                method.showIcon(method.options.icon.refresh, true);
+                method.icon.hidden(method.options.icon.refresh);
                 excuteFunc(method.modal.hidden);
             });
         }
@@ -162,8 +264,8 @@
             method.modal.show();
         }
         function validated() {
-            if (method.succeed) return method.showIcon(method.options.icon.succeed, false);
-            method.showIcon(method.options.icon.failed, false);
+            let icon = method.succeed ? method.options.icon.succeed : method.options.icon.failed;
+            method.icon.show(icon);
         }
         function finished() {
             method.modal.hidden();
@@ -172,15 +274,12 @@
         }
         function destory() {
             method.options.imgRoot.onclick = null;
-            if (!method.autoValidate && !!func.submit) show(func.submit, true);
+            if (!method.autoValidate && !!func.options.submit) show(func.options.submit, false);
             clearIcons();
-            func.submit = null;
+            func.options.submit = null;
         }
-        function getRequestData() {
-            if (method.maxPoint == method.points.length) {
-                return method.createJsonData(true, { points: method.points, tk: method.data.tk });
-            }
-            return method.createJsonData();
+        function jsonData() {
+            return method.createJsonData(true, { points: method.points, tk: method.data.tk });
         }
 
         function clickPoint(event) {
@@ -201,10 +300,10 @@
                 })
                 method.addPoint(x, y);
             }
-            if (canValidate) submitData();
+            if (method.autoValidate && canValidate()) method.validate();
         }
         function submitData(result) {
-            method.validate(result);
+            if (!method.autoValidate && canValidate()) method.validate(result);
         }
         function canValidate() {
             return method.points.length == method.maxPoint;
@@ -234,57 +333,41 @@
         }
         function bindClick() {
             method.options.imgRoot.onclick = clickPoint;
-            func.submit = method.container.querySelector("." + func.options.css.submit);
-            if (!func.submit) return;
-            if (!method.autoValidate) show(func.submit, false);
-            func.submit.onclick = submitData;
+            func.options.submit = method.container.querySelector("." + func.options.css.submit);
+            if (!func.options.submit) return;
+            if (!method.autoValidate) show(func.options.submit);
+            func.options.submit.onclick = submitData;
         }
         return func;
     }
+    /* ----------------------------------------------- */
 
-    function captcha(container, options) {
-        function template() {
-            let func = {
-                options: {
-                    url: null,
-                    points: [],
-                    method: {
-                        setRequestData: null,
-                        allowRefresh: null,
-                        validatePoint: null,
-                        validate: null,
-                        validated: null,
-                        btn_refresh: null,
-                        setData: null,
-                        setResult: null,
-                        ready: null,
-                        refreshCaptcha:null
-                    },
-                    autoValidate: true,
-                    autoRefresh: true,
-                    divImg: null,
-                    canvas: null,
-                    controlRoot: null,
-                    imgRoot: null,
-                    tips: null,
-                    modal: null,
-                    icon: {
-                        refresh: "captcha-icon-refresh",
-                        succeed: "captcha-icon-succeed",
-                        failed: "captcha-icon-failed"
-                    }
-                },
-                tools: {},
-                container: null,
-                succeed: false,
-                verifying: false
-            };
-            return func;
+    function createTool(callback, method) {
+        let tool = toolTemplate();
+        if (isFunction(callback)) callback(tool, method);
+        return tool;
+    }
+    function refreshTool(tool) {
+        tool.init = function (method) {
+            tool.element = method.container.querySelector(".captcha-control-refresh");
+            if (tool.element) {
+                tool.element.onclick = function () {
+                    if (!!excuteFunc(tool.options.callback)) return;
+                    excuteFunc(method.drawCaptcha);
+                }
+            }
+            tool.delete = function () {
+                if (this.element) this.element.remove();
+            }
         }
+    }
+    /* -------- catpcha management -------------- */
+    function captcha(container, options) {
         let captchas = (function () {
             let func = {};
             return func;
         })();
+        let tools = (function () { let func = {}; return func; })();
         let captchaData = mapData(), captchaResult = mapResult(), method = new template();
         mapObject(options, method.options);
         method.container = container || document.querySelector("#flyingrat");
@@ -294,53 +377,52 @@
         method.options.imgRoot = method.container.querySelector(".captcha-control-image");
         method.options.tips = method.container.querySelector(".captcha-control-tips");
         method.options.modal = method.container.querySelector(".captcha-modal");
-        let refbtn = method.container.querySelector(".captcha-control-refresh");
-        if (refbtn) {
-            refbtn.onclick = function () {
-                if (isFunction(method.options.method.btn_refresh)) method.options.method.btn_refresh();
-                else autoDrawImage();
-            };
-            addTool("refresh", refbtn);
-        }
         defineProperty();
+
+        addTool("refresh", createTool(refreshTool, method));
+
         addCaptcha("slidercaptcha", { init: captchaSlider, type: 2, ignoreAutoValidate: false });
         addCaptcha("pointcaptcha", { init: captchaClick, type: 3, ignoreAutoValidate: true });
 
         function defineProperty() {
             Object.defineProperties(method, {
-                "name": { get: function () { return !!method.data.name?method.data.name.toLowerCase():null; } },
+                "name": { get: function () { return !!method.data.name ? method.data.name.toLowerCase() : null; } },
                 "type": { get: function () { return method.current.type || null } },
                 "data": { get: function () { return captchaData } },
                 "result": { get: function () { return captchaResult; } },
                 "captchas": { get: function () { return captchas; } },
-                "current": { get: function () { return !!method.name?captchas[method.name]:null; } },
+                "tools": { get: function () { return tools; } },
+                "InvokeCaptcha": { get: function () { return InvokeCaptcha; } },
+                "current": { get: function () { return !!method.name ? captchas[method.name] : null; } },
                 "points": { get: function () { return method.options.points; } },
-                "clearPoints": { get: function () { return clearPoints; } },
                 "maxPoint": { get: function () { return method.data.x || 0; } },
+                "addPoint": { get: function () { return addPoint; } },
+                "clearPoints": { get: function () { return clearPoints; } },
                 "addCaptcha": { get: function () { return addCaptcha; } },
                 "updateOptions": { get: function () { return updateOptions; } },
+                "addTool": { get: function () { return addTool; } },
+                "createTool": { get: function () { return createTool; } },
+                "updateTool": { get: function () { return updateTool; } },
                 "mapData": { get: function () { return mapData; } },
                 "mapResult": { get: function () { return mapResult; } },
                 "drawCaptcha": { get: function () { return drawImage; } },
-                "drawPoint": { get: function () { return drawPoint;}},
+                "drawPoint": { get: function () { return drawPoint; } },
+                "refresh": { get: function () { return autoDrawImage; } },
                 "destroy": { get: function () { return destroy; } },
                 "destroyCurrent": { get: function () { return destoryCaptcha; } },
-                "InvokeCaptcha": { get: function () { return InvokeCaptcha; } },
-                "refresh": { get: function () { return autoDrawImage; } },
                 "validate": { get: function () { return verify; } },
                 "validated": { get: function () { return verified; } },
                 "validatePoint": { get: function () { return validatePoint; } },
-                "addPoint": { get: function () { return addPoint; } },
                 "createJsonData": { get: function () { return createJson; } },
                 "delayedFunction": { get: function () { return delayedFuc; } },
                 "autoValidate": { get: function () { return isAutoType(); } },
                 "autoRefresh": { get: function () { return method.options.autoRefresh; } },
+                "templdate": { get: function () { return { captcha: captchaTemplate,toolTemplate:toolTemplate} } },
                 "updateTips": { get: function () { return updateTips; } },
                 "show": { get: function () { return rootShow; } },
                 "hidden": { get: function () { return rootHidden; } },
                 "modal": { get: function () { return { show: showModal, hidden: hiddenModal } } },
-                "icon": { get: function () { return { show: function () { showIcon(null, false); }, hidden: function () { showIcon(null, true); } } } },
-                "showIcon": { get: function () { return showIcon; } }
+                "icon": { get: function () { return { show: function (icon) { showIcon(icon); }, hidden: function (icon) { hiddenIcon(icon); } } } }
             })
         }
 
@@ -353,21 +435,34 @@
             method.icon.hidden();
             hiddenModal();
         }
-
         function destoryCaptcha() {
             if (!method.current) return;
             InvokeCaptcha("exit");
         }
-
         function destroy() {
             InvokeCaptcha("exit", false);
+            invokTools("delete");
             clearPoints();
             method = null;
         }
 
+        function invokTools(name,arg) {
+            if (typeof name != "string") return;
+            Object.values(method.tools).forEach(function (tool) {
+                excuteFunc(tool[name],arg);
+            })
+        }
         function addTool(key, tool) {
             if (!key) return false;
+            let oldTool = method.tools[key];
+            if (oldTool) excuteFunc(oldTool.delete);
             method.tools[key] = tool;
+            return tool;
+        }
+        function updateTool(key,options) {
+            if (!key) return false;
+            let tool = method.tools[key];
+            if (tool) mapObject(options, tool.options)
         }
 
         function autoDrawImage() {
@@ -383,7 +478,7 @@
             }
         }
         function drawImage(data) {
-            if (!data) { delayedFuc(0.1,autoDrawImage);return;}
+            if (!data) { delayedFuc(0.1, autoDrawImage); return; }
             let canvas = method.options.canvas;
             canvas == null ? drawDivImage(data) : drawCanvasImage(data);
         }
@@ -393,10 +488,10 @@
             captchaData = data;
             initCaptcha();
             if (!hasShowCaptcha()) {
-                show(container, true);
+                show(container, false);
                 return readyCaptcha();
             }
-            show(container,false);
+            show(container);
             let div = method.options.divImg;
             if (div == null) return;
             let url = data.isAction ? data.bgGap + "?tk=" + data.tk : data.bgGap;
@@ -433,7 +528,7 @@
             for (let i = 0; i < images.length; i++) {
                 div.appendChild(images[i]);
             }
-            readyCaptcha();
+            readyShowCaptcha();
         }
         function drawCanvasImage(data) {
             if (isFunction(method.options.method.setData)) data = method.options.method.setData(data);
@@ -441,10 +536,10 @@
             captchaData = data;
             initCaptcha();
             if (!hasShowCaptcha()) {
-                show(container, true);
+                show(container, false);
                 return readyCaptcha();
             }
-            show(container, false);
+            show(container);
             let canvas = method.options.canvas;
             let ctx = canvas.getContext("2d");
             canvas.setAttribute("width", data.width);
@@ -474,14 +569,14 @@
                     ctx.drawImage(image, xxpos, xy * height, curWidth, height, xpos, y * height, curWidth, height);
                     xxpos += curWidth;
                 }
-                readyCaptcha();
+                readyShowCaptcha();
             }
         }
 
         function addCaptcha(key, options) {
-            if (!options || typeof options !="object" || !key || !options.init&&!isFunction(options.init) ) return false;
+            if (!options || typeof options != "object" || !key || !options.init && !isFunction(options.init)) return false;
             let type = isNaN(options.type) ? 0 : parseInt(options.type);
-            let captcha = { bindCaptcha: options.init(method), type: type, ignoreAutoValidate: !!options.ignoreAutoValidate };
+            let captcha = { bindCaptcha: mapObject(options.init(method), new captchaTemplate()), type: type, ignoreAutoValidate: !!options.ignoreAutoValidate };
             method.captchas[key.toLowerCase()] = captcha;
             return captcha;
         }
@@ -504,10 +599,13 @@
             initBindCaptcha();
             executeReady(method);
         }
+        function readyShowCaptcha() {
+            initBindCaptcha();
+            invokTools("init",method);
+            executeReady(method);
+        }
+
         function initBindCaptcha() {
-            let span = document.createElement("span");
-            span.innerText = method.data.tips;
-            updateTips(span, true);
             let captcha = method.captchas[method.name];
             if (captcha) excuteFunc(captcha.bindCaptcha.init);
         }
@@ -522,7 +620,7 @@
 
         function validatePoint(x, y) {
             if (isFunction(method.options.method.validatePoint)) {
-                return !!method.options.method.validatePoint(x, y,method);
+                return !!method.options.method.validatePoint(x, y, method);
             } else {
                 return method.points.length < method.maxPoint;
             }
@@ -542,7 +640,7 @@
         function verify() {
             if (!InvokeCaptcha("allowVerify")) return;
             method.verifying = true;
-            excuteFunc("validate");
+            InvokeCaptcha("validate");
             if (isFunction(method.options.method.validate)) {
                 let isValid = method.options.method.validate(verified, method);
                 if (isValid) return;
@@ -571,22 +669,22 @@
             if (isFunction(method.options.method.setResult)) udata = method.options.method.setResult(data);
             captchaResult = mapResult(udata || data);
             method.succeed = captchaResult.succeed;
+            InvokeCaptcha("validated");
+            if (isFunction(method.options.method.validated)) {
+                method.options.method.validated(captchaResult, method.current.bindCaptcha.finished, method);
+            } else {
+                InvokeCaptcha("finished");
+            }
+            clearPoints();
+            method.verifying = false;
             if (captchaResult.refresh && (method.options.autoRefresh || isFunction(method.options.allowRefresh) && method.options.allowRefresh(captchaResult, method))) {
                 delayedFuc(1, autoDrawImage);
                 return;
             }
-            excuteFunc(method.current.bindCaptcha.validated);
-            if (isFunction(method.options.method.validated)) {
-                method.options.method.validated(captchaResult, method.current.bindCaptcha.finished,method);
-            } else {
-                excuteFunc(method.current.bindCaptcha.finished);
-            }
-            clearPoints();
-            method.verifying = false;
         }
 
         function mapResult(data, options) {
-            let innerData = { token: null, succeed: false, refresh: false };
+            let innerData = resultTemplate();
             if (!data) return innerData;
             let callback = keyMap = null;
             if (options) {
@@ -595,52 +693,63 @@
             }
             return mapObject(data, innerData, callback, keyMap);
         }
-        function mapData(data,options) {
-            let innerData = { name:null,index: null, change: null, width: 0, height: 0, col: 0, row: 0, x: 0, y: 0, tk: null, bgGap: null, gap: null, full: null, validate: null, isAction: false, tips: null, tw: 0, th: 0, type: 0};
+        function mapData(data, options) {
+            let innerData = dataTemplate();
             if (!data) return innerData;
             let callback = keyMap = null;
             if (options) {
-                 callback = options.callback || null;
-                 keyMap = options.keyMap || null;
+                callback = options.callback || null;
+                keyMap = options.keyMap || null;
             }
             return mapObject(data, innerData, callback, keyMap);
         }
 
         function hasShowCaptcha() {
-            return method.current.bindCaptcha.hasShow || false;
+            return method.current && method.current.bindCaptcha.hasShow || false;
         }
         function showModal() {
             if (!hasShowCaptcha()) return;
-            show(method.options.modal, false);
+            show(method.options.modal);
         }
         function rootShow() {
-            show(method.container, false);
+            show(method.container);
         }
         function rootHidden() {
-            show(method.container, true);
+            show(method.container, false);
         }
         function hiddenModal() {
             if (!hasShowCaptcha()) return;
-            show(method.options.modal, true);
+            show(method.options.modal, false);
         }
         function isAutoType() {
             if (!method.current.ignoreAutoValidate) return true;
             return !!method.options.autoValidate;
         }
 
-        function showIcon(icon,hidden) {
+        function showIcon(icon) {
             if (icon && typeof icon != "string") return;
-            hidden = isNaN(hidden) ? true : !!hidden;
-            if (icon) return show(method.container.querySelector("." + icon), hidden);
+            if (icon) return show(method.container.querySelector("." + icon));
             Object.values(method.options.icon).forEach(function (icon) {
-                show(method.container.querySelector("." + icon), hidden);
+                show(method.container.querySelector("." + icon));
             })
+        }
+        function hiddenIcon(icon) {
+            if (!isNaN(icon) || !icon) {
+                Object.values(method.options.icon).forEach(function (icon) {
+                    show(method.container.querySelector("." + icon), false);
+                })
+            }
+            if (typeof icon != "string") return;
+            return show(method.container.querySelector("." + icon), false);
         }
         return method;
     }
+    /* ----------------------------------------------- */
+
+    /* -------------------------commond---------------------- */
     function createJson(succeed, data) {
         succeed = !!succeed;
-        return {succeed:succeed,data:data}
+        return { succeed: succeed, data: data }
     }
     function delayedFuc(second, func, callback) {
         second = isNaN(second) ? 0 : Number(second);
@@ -649,16 +758,18 @@
             if (isFunction(callback)) callback();
         }, second * 1000)
     }
-    function show(element, hidden) {
+
+    function show(element, isShow) {
         if (!element) return;
-        element.style.display = !!hidden ? "none" : "block";
+        isShow = isNaN(isShow) ? true : !!isShow;
+        element.style.display = !!isShow ? "block" : "none";
     }
 
     function getNumberPx(number) {
         return parseInt(number) + "px";
     }
 
-    function excuteFunc(func,arg) {
+    function excuteFunc(func, arg) {
         if (!isFunction(func)) return;
         return func(arg);
     }
@@ -666,13 +777,14 @@
         if (func && typeof func === "function") return true;
         return false;
     }
+    function noneFunc() { }
 
     function Ajax() {
         let func = {
             get: get,
-            post:post
+            post: post
         }
-        function get(url,callback,async) {
+        function get(url, callback, async) {
             let request = createXMLHttpRequest();
             if (!request) return;
             async = isNaN(async) ? true : async;
@@ -687,7 +799,7 @@
             request.send();
             return request;
         }
-        function post(url,data,callback,async) {
+        function post(url, data, callback, async) {
             let request = createXMLHttpRequest();
             if (!request) return;
             async = isNaN(async) ? true : async;
@@ -734,8 +846,8 @@
     * @param {Object} setting 指定源key数据 与 目标key的映射
      */
     function mapObject(source, target, callback, setting) {
-        var hasSetting = setting && typeof setting == "object";
-        var targetKeys = Object.keys(source);
+        let hasSetting = setting && typeof setting == "object";
+        let targetKeys = Object.keys(source);
         if (hasSetting) {
             Object.keys(setting).forEach(key => {
                 targetKeys.forEach((source, index) => {
@@ -745,18 +857,21 @@
         }
         //把源数据的值 映射到目标对象中
         targetKeys.forEach(key => {
-            var value = source[key];
+            let value = source[key];
+            if (value == undefined) return;
             if (callback && typeof callback == 'function') {
                 value = callback(key, value, source);
             }
+            if (target[key] == null) return target[key] = value;
+            if (typeof target[key] == "object") return mapObject(value, target[key]);
             target[key] = value;
         });
 
         //如果有映射配置 执行
         if (hasSetting) {
             Object.keys(source).forEach(key => {
-                var targetSetting = setting[key];
-                var type = typeof targetSetting;
+                let targetSetting = setting[key];
+                let type = typeof targetSetting;
                 if (type == "object") {
                     if (targetSetting.key && targetSetting.callback && typeof targetSetting.callback == "function") {
                         target[targetSetting.key] = targetSetting.callback(source[key], source);
@@ -769,5 +884,7 @@
         }
         return target;
     }
+    /* ----------------------------------------------- */
+
     window.captcha = captcha;
 })(window, jQuery)

@@ -93,20 +93,23 @@
         function validated(data,callback,captcha) {
             console.debug("拿到验证结果", data)
 
-            //callback：调用当前的验的实现的 finished 方法，当前验证码的后续处理
-            captcha.delayedFunction(0.5, callback);
-
             if (data.success) console.debug("验证正确，获取校验 token：", data.token);
 
             //autoRefresh：false  需要手动刷新验证码
-            if (!captcha.autoRefresh && data.refresh) captcha.drawCaptcha();
+            if (!captcha.autoRefresh && data.refresh) {
+                captcha.drawCaptcha();
+                return;
+            }
+
+            //callback：调用当前的验的实现的 finished 方法，当前验证码的后续处理
+            captcha.delayedFunction(0.5, callback);
         }
     function LoadImage(type) {
         reType = type;
         if (cap) cap.destroy(); if (divCap) divCap.destroy();
         cap = new captcha(document.querySelector("#canvasCaptach"), {
             url: "@Html.Raw(Url.Action("RandImage"))?type=" + type + "&row=3&col=15",
-            autoValidate: true,
+            autoValidate: false,
             autoRefresh: false,
             method: {
                 ready: function (captcha) {
