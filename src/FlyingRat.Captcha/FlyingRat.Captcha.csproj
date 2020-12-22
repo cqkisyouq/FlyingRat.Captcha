@@ -6,11 +6,13 @@
 	<Description></Description>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<PackageProjectUrl>https://github.com/cqkisyouq/FlyingRat.Captcha</PackageProjectUrl>
-	<Version>1.0.0</Version>
+	<Version>1.0.1</Version>
 	<AssemblyVersion>1.0.0.0</AssemblyVersion>
 	<FileVersion>1.0.0.0</FileVersion>
 	<PackageTags>FlyingRat</PackageTags>
 	<Authors>FlyingRat</Authors>
+	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<!--<IsTool>true</IsTool>-->
   </PropertyGroup>
   
