@@ -4,6 +4,7 @@ using FlyingRat.Captcha.Interface;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FlyingRat.Captcha.Validator
 {
@@ -20,6 +21,6 @@ namespace FlyingRat.Captcha.Validator
             result.AllowValidate = options==null? result.Count<=Options?.Validate_Max: result.Count <= options.Validate_Max;
             return result.AllowValidate;
         }
-        public abstract ValidateResult Validate(CaptchaValidateContext context, BaseCaptchaOptions options = null);
+        public abstract ValueTask<ValidateResult> Validate(CaptchaValidateContext context, BaseCaptchaOptions options = null);
     }
 }

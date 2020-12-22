@@ -7,6 +7,9 @@
             <div class="captcha-img"></div>
             <img class="captcha-slider-img" />
         </div>
+        <div class="captcha-control-top">
+            <div class="captcha-control-refresh"></div>
+        </div>
         <div class="captcha-control">
             <div class="captcha-control-tips">
                 <span>向右拖动滑块填充拼图</span>
@@ -21,6 +24,7 @@
                 <div class="captcha-icon-refresh"></div>
             </div>
         </div>
+        <button class="btn-outline-primary btn-block mt-1 captcha-manual-submit" style="height:40px;">确定</button>
     </div>
 
     <div class="captcha-container" id="canvasCaptach">
@@ -47,7 +51,7 @@
                 <div class="captcha-icon-failed"></div>
             </div>
         </div>
-       <button class="btn-outline-primary btn-block mt-1 captcha-manual-submit" style="height:40px;">确定</button>
+        <button class="btn-outline-primary btn-block mt-1 captcha-manual-submit" style="height:40px;">确定</button>
     </div>
 </div>
 <div style="display:flex;">
@@ -62,8 +66,7 @@
 </div>
 
 @section Styles{
-    <link href="~/css/flyingrat.captcha.css" rel="stylesheet" />
-    @*<link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">*@
+    <link href="~/js/flyingrat/css/flyingrat.captcha.css" rel="stylesheet" />
     <style>
         .pd {
             margin-left: 5px;
@@ -72,7 +75,7 @@
 }
 
 @section Scripts{
-    <script src="~/js/flyingrat.captcha.js"></script>
+    <script src="~/js/flyingrat/js/flyingrat.captcha.js"></script>
     <script>
         var cap, divCap;
         function validate(callback, captcha) {
@@ -105,8 +108,8 @@
             captcha.delayedFunction(0.5, callback);
         }
     function LoadImage(type) {
-        reType = type;
         if (cap) cap.destroy(); if (divCap) divCap.destroy();
+
         cap = new captcha(document.querySelector("#canvasCaptach"), {
             url: "@Html.Raw(Url.Action("RandImage"))?type=" + type + "&row=3&col=15",
             autoValidate: false,
@@ -131,7 +134,9 @@
             autoValidate: false,
             autoRefresh:false
         });
+
         cap.drawCaptcha();
+
         $.get('@Html.Raw(Url.Action("RandImage"))', {type:type,row:2,col:15}, function (data) {
             var back = document.getElementById("background");
             back.src = data.isAction ? data.full + "?tk=" + data.tk + "&&t=" + new Date().getMilliseconds() : data.full;

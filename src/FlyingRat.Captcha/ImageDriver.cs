@@ -20,7 +20,7 @@ namespace FlyingRat.Captcha
             col = source.Width / width;
             row = source.Height / height;
             List<RandData> randData = GenerateData(col, row);
-            List<RandData> images = new List<RandData>();
+            List<RandData> images = new List<RandData>(randData.Count);
             Stack<RandData> lastData = new Stack<RandData>(row);
             for (int i = 0,rcount=randData.Count; i < rcount; i++)
             {
@@ -111,7 +111,7 @@ namespace FlyingRat.Captcha
         }
         private List<RandData> GenerateData(int col, int row)
         {
-            List<RandData> images = new List<RandData>();
+            List<RandData> images = new List<RandData>(col*row);
             var index = 0;
             for (int i = 0; i < row; i++)
             {

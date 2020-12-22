@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FlyingRat.Captcha.Validator
 {
@@ -20,7 +21,7 @@ namespace FlyingRat.Captcha.Validator
             _options = options?.Value;
         }
         public PointValidator() { }
-        public override ValidateResult Validate(CaptchaValidateContext context, BaseCaptchaOptions options)
+        public override ValueTask<ValidateResult> Validate(CaptchaValidateContext context, BaseCaptchaOptions options)
         {
             var model = context.GetResult();
             model.IsValidate = true;
@@ -28,7 +29,7 @@ namespace FlyingRat.Captcha.Validator
             model.Succeed = false;
             var sourcePoints = context.Source.Points;
             var points = context.Validate.Points;
-            if (!points?.Any() ?? true || points.Count != sourcePoints?.Count) return model;
+            if (!points?.Any() ?? true || points.Count != sourcePoints?.Count) return new ValueTask<ValidateResult>(model);
 
             var offset =options?.Offset ?? _options.Offset;
             model.Succeed = true;
@@ -48,7 +49,7 @@ namespace FlyingRat.Captcha.Validator
                 break;
             }
             model.AllowValidate = !model.Succeed;
-            return model;
+            return  new ValueTask<ValidateResult>(model);
         }
     }
 }

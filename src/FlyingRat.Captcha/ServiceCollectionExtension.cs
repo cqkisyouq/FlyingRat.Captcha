@@ -23,12 +23,11 @@ namespace FlyingRat.Captcha
 
             service.AddCaptchaValidator<SliderValidator>();
             service.AddCaptchaValidator<PointValidator>();
-            service.AddScoped<IValidateManager, ValidatorManager>();
 
             service.AddTransient<CaptchaImageBuilder>();
             service.AddScoped<ICaptchaValidatorFactory, DefaultCaptchaValidatorFactory>();
 
-            service.AddSingleton<IValidateHandlerFactory, DefaultValidateHandlerFactory>();
+            service.AddScoped<IValidateHandlerFactory, DefaultValidateHandlerFactory>();
             service.AddSingleton<ITokenGenerate, DefaultTokenGenerate>(); 
             return service;
         }
@@ -45,7 +44,7 @@ namespace FlyingRat.Captcha
         }
         public static IServiceCollection AddCaptchaHandler<T>(this IServiceCollection service) where T:ICaptchaHandler,new ()
         {
-            service.AddSingleton(typeof(ICaptchaHandler), typeof(T));
+            service.AddScoped(typeof(ICaptchaHandler), typeof(T));
             return service;
         }
     }

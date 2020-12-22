@@ -6,6 +6,96 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\pic_1.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\pic_2.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\pic_3.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\pic_4.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景1.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景10.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景11.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景12.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景13.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景14.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景15.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景16.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景2.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景3.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景4.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景5.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景6.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景7.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景8.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Background\背景9.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\base\alpha.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\base\base.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\base\pic_1.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\base\pic_2.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\base\pic_3.jpg" />
+    <Content Remove="wwwroot\js\flyingrat\Image\base\top.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\captcha_icon.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Lump\b1_方形.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Lump\b2_星形.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Lump\b3_圆形.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Sliders\1\alpha.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Sliders\1\border.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Sliders\1\image.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Sliders\2\alpha.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Sliders\2\border.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Sliders\2\image.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Sliders\3\alpha.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Sliders\3\border.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Sliders\3\image.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Sliders\4\alpha.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Sliders\4\border.png" />
+    <Content Remove="wwwroot\js\flyingrat\Image\Sliders\4\image.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\flyingrat\Image\Background\pic_1.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\pic_2.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\pic_3.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\pic_4.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景1.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景10.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景11.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景12.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景13.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景14.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景15.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景16.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景2.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景3.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景4.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景5.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景6.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景7.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景8.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\Background\背景9.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\base\alpha.png" />
+    <None Include="wwwroot\js\flyingrat\Image\base\base.png" />
+    <None Include="wwwroot\js\flyingrat\Image\base\pic_1.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\base\pic_2.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\base\pic_3.jpg" />
+    <None Include="wwwroot\js\flyingrat\Image\base\top.png" />
+    <None Include="wwwroot\js\flyingrat\Image\captcha_icon.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Lump\b1_方形.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Lump\b2_星形.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Lump\b3_圆形.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Sliders\1\alpha.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Sliders\1\border.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Sliders\1\image.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Sliders\2\alpha.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Sliders\2\border.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Sliders\2\image.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Sliders\3\alpha.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Sliders\3\border.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Sliders\3\image.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Sliders\4\alpha.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Sliders\4\border.png" />
+    <None Include="wwwroot\js\flyingrat\Image\Sliders\4\image.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.10" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta11" />
   </ItemGroup>

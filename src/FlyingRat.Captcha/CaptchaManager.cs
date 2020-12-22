@@ -14,13 +14,10 @@ namespace FlyingRat.Captcha
         private readonly ICaptchaValidatorFactory _validatorFactory;
         private readonly IValidateHandlerFactory _validateHandlerFactory;
         private readonly ITokenGenerate _token;
-        private readonly IImageProvider _imageProvider;
-        private readonly Random _rd = new Random(DateTime.Now.Millisecond);
         public CaptchaManager(
             ICaptchaValidatorFactory validatorFactory,
             IValidateHandlerFactory validateHandlerFactory,
             ITokenGenerate token,
-            IImageProvider imageProvider,
             ICaptchaFactory captchaFactory
             )
         {
@@ -28,7 +25,6 @@ namespace FlyingRat.Captcha
             _validateHandlerFactory = validateHandlerFactory;
             _token = token;
             _factory = captchaFactory;
-            _imageProvider = imageProvider;
         }
 
         public ValueTask<ValidateResult> Validate<T>(CaptchaValidateContext context, BaseCaptchaOptions options) where T : ICaptcha, new()
@@ -36,22 +32,22 @@ namespace FlyingRat.Captcha
             var type = typeof(T).Name;
             return Validate(type, context, options);
         }
-        public ValueTask<ValidateResult> Validate(string captcha, CaptchaValidateContext context, BaseCaptchaOptions options)
+        public async ValueTask<ValidateResult> Validate(string captcha, CaptchaValidateContext context, BaseCaptchaOptions options)
         {
             var validator = _validatorFactory.Create(captcha);
-            if (validator == null) return new ValueTask<ValidateResult>(ValidateResult.Failed);
-            if (!validator.AllowValidate(context, options)) return new ValueTask<ValidateResult>(context.GetResult().NotAllow());
+            if (validator == null) return ValidateResult.Failed;
+            if (!validator.AllowValidate(context, options)) return context.GetResult().NotAllow();
 
             var handlers = _validateHandlerFactory?.Create(captcha);
             handlers?.Handing(async (handler, context) =>await handler.Validating(context,options), context);
-            if (!validator.AllowValidate(context)) return new ValueTask<ValidateResult>(context.GetResult().NotAllow());
+            if (!validator.AllowValidate(context)) return context.GetResult().NotAllow();
 
-            validator.Validate(context,options);
+            await validator.Validate(context,options);
             var result = context.GetResult();
             if (result.Token == null && result.Succeed) result.Token = _token.Create();
             if (!result.Succeed) result.Token = null;
             handlers?.Reverse().Handing(async (handler, context) => await handler.Validated(context, options), context);
-            return new ValueTask<ValidateResult>(result);
+            return result;
         }
 
         ValueTask<CaptchaImage> ICaptchaManager.Captcha<T>(BaseCaptchaOptions options)
@@ -63,6 +59,7 @@ namespace FlyingRat.Captcha
         public async ValueTask<CaptchaImage> Captcha(string type, BaseCaptchaOptions options)
         {
             var captcha = _factory.Create(type);
+            if (captcha == null) return default;
             var handlers = _validateHandlerFactory?.Create(type);
             CaptchaContext context = null;
             if (handlers?.Any() ?? false)
@@ -71,8 +68,7 @@ namespace FlyingRat.Captcha
             }
 
             handlers?.Handing(async (handler, context) => await handler.Creating(context), context);
-            var rdImage =captcha?.Captcha(options);
-            var model = await rdImage.Value;
+            var model = await captcha.Captcha(options);
             if (model.Token == null) model.Token = _token.Create();
             if(model.Options==null) model.Options = options?.Clone() as BaseCaptchaOptions;
             if (handlers?.Any() ?? false)

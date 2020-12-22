@@ -3,6 +3,7 @@ using FlyingRat.Captcha.Context;
 using FlyingRat.Captcha.Interface;
 using Microsoft.Extensions.Options;
 using System;
+using System.Threading.Tasks;
 
 namespace FlyingRat.Captcha.Validator
 {
@@ -20,14 +21,14 @@ namespace FlyingRat.Captcha.Validator
         {
 
         }
-        public override ValidateResult Validate(CaptchaValidateContext context, BaseCaptchaOptions options)
+        public override  ValueTask<ValidateResult> Validate(CaptchaValidateContext context, BaseCaptchaOptions options)
         {
             var model = context.GetResult();
             model.IsValidate = true;
             model.Count++;
             model.Succeed = false;
-
-            if (context.Validate?.Points?.Count != 1) return model;
+            
+            if (context.Validate?.Points?.Count != 1) return new ValueTask<ValidateResult>(model);
             var targetPoint = context.Validate.Points[0];
             var vPoint = context.Source.Points[0];
 
@@ -39,7 +40,8 @@ namespace FlyingRat.Captcha.Validator
                 model.Succeed = true;
                 model.AllowValidate = false;
             }
-            return model;
+
+            return new ValueTask<ValidateResult>(model);
         }
     }
 }

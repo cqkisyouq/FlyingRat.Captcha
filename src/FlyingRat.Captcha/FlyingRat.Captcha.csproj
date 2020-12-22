@@ -15,7 +15,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-	<None Include="contentFiles\**" Pack="True" PackagePath="contentFiles\any\any\wwwroot" PackageCopyToOutput="true" />
+	<None Include="contentFiles\**" Pack="True" PackagePath="contentFiles\any\any\wwwroot\js" PackageCopyToOutput="true" />
   </ItemGroup>
   
   <ItemGroup>

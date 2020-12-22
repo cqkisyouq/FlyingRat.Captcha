@@ -1,4 +1,6 @@
-﻿using FlyingRat.Captcha.Interface;
+﻿using FlyingRat.Captcha.Configuration;
+using FlyingRat.Captcha.Interface;
+using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
@@ -11,17 +13,13 @@ namespace FlyingRat.Captcha
 {
     public class ImageFileProvider : IImageProvider
     {
-        private string Background_Path { get; set; } = "wwwroot/Image/Background";
-        private string Slider_Path { get; set; } = "wwwroot/Image/Sliders";
-        private string Lump_Path { get; set; } = "wwwroot/Image/Lump";
-        private string Alpha_Name { get; set; } = "alpha.png";
-        private string Border_Name { get; set; } = "border.png";
-        private string Image_Name { get; set; } = "image.png";
         private Random Random { get; } = new Random(DateTime.Now.Millisecond);
         private readonly string[] SliderPath;
-        public ImageFileProvider()
+        public CaptchaImageOptions _imageOptions { get; set; }
+        public ImageFileProvider(IOptions<CaptchaImageOptions> options)
         {
-            SliderPath = FindDirectorys(Slider_Path);
+            _imageOptions = options.Value;
+            SliderPath = FindDirectorys(_imageOptions.Slider_Path);
         }
         public string SliderRoot
         {
@@ -35,7 +33,7 @@ namespace FlyingRat.Captcha
         {
             get
             {
-                return Lump_Path;
+                return _imageOptions.Lump_Path;
             }
         }
         public string[] LoadFilesPath(string directory)
@@ -44,7 +42,7 @@ namespace FlyingRat.Captcha
         }
         public async Task<Image<Rgba32>> LoadBackground()
         {
-            var files = FindFiles(Background_Path);
+            var files = FindFiles(_imageOptions.Background_Path);
             if (files == null) return default;
             var index = Random.Next(0, files.Length);
             var image = await LoadImage(files[index]);
@@ -52,17 +50,17 @@ namespace FlyingRat.Captcha
         }
         public Task<Image<Rgba32>> LoadAlpha(string path)
         {
-            var name = Path.Combine(path, Alpha_Name);
+            var name = Path.Combine(path, _imageOptions.Alpha_Name);
             return LoadImage(name);
         }
         public Task<Image<Rgba32>> LoadBorder(string path)
         {
-            var name = Path.Combine(path, Border_Name);
+            var name = Path.Combine(path, _imageOptions.Border_Name);
             return LoadImage(name);
         }
         public Task<Image<Rgba32>> LoadSlider(string path)
         {
-            var name = Path.Combine(path, Image_Name);
+            var name = Path.Combine(path, _imageOptions.Image_Name);
             return LoadImage(name);
         }
         public Task<Image<Rgba32>> LoadImage(string path)
@@ -99,7 +97,7 @@ namespace FlyingRat.Captcha
 
         private string[] FindFiles(string dir)
         {
-            var str_Path = dir;
+            var str_Path = Path.Combine(_imageOptions.Root, dir);
             //Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dir);
             if (Directory.Exists(str_Path))
             {
@@ -118,7 +116,7 @@ namespace FlyingRat.Captcha
         /// <returns></returns>
         private string[] FindDirectorys(string dir)
         {
-            var str_Path = dir;
+            var str_Path = Path.Combine(_imageOptions.Root, dir);
             //Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dir);
             if (Directory.Exists(str_Path))
             {
