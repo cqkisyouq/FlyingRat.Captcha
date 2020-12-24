@@ -22,6 +22,8 @@
         <div class="captcha-modal">
             <div class="captcha-modal-body">
                 <div class="captcha-icon-refresh"></div>
+                <div class="captcha-icon-succeed"></div>
+                <div class="captcha-icon-failed"></div>
             </div>
         </div>
         <button class="btn-outline-primary btn-block mt-1 captcha-manual-submit" style="height:40px;">确定</button>
@@ -112,7 +114,7 @@
 
         cap = new captcha(document.querySelector("#canvasCaptach"), {
             url: "@Html.Raw(Url.Action("RandImage"))?type=" + type + "&row=3&col=15",
-            autoValidate: false,
+            autoValidate: true,
             autoRefresh: false,
             method: {
                 ready: function (captcha) {
@@ -123,6 +125,10 @@
                     //        captcha.validate();
                     //    })
                     //}
+                    console.debug("ready")
+                },
+                readyData: function (data,captcha) {
+                    console.debug("readyData");
                 },
                 validate:validate,
                 validated: validated
@@ -135,6 +141,19 @@
             autoRefresh:false
         });
 
+        cap.updateCaptcha("slidercaptcha", {
+            events: {
+                validate: function (captcha) {
+                    console.debug("validate", captcha.current.jsonData())
+                },
+                validated: function (result,captcha) {
+                    console.debug("validated",result)
+                },
+                finished: function (captcha) {
+                    console.debug("finished",captcha.current)
+                }
+            }
+        })
         cap.drawCaptcha();
 
         $.get('@Html.Raw(Url.Action("RandImage"))', {type:type,row:2,col:15}, function (data) {

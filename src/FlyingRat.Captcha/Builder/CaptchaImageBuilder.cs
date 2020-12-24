@@ -1,9 +1,9 @@
 ﻿using FlyingRat.Captcha.Configuration;
+using FlyingRat.Captcha.Model;
 using FlyingRat.Captcha.Validator;
 using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FlyingRat.Captcha.Builder
 {
@@ -64,14 +64,9 @@ namespace FlyingRat.Captcha.Builder
             Captcha.Value.Tips = tips;
             return this;
         }
-        public CaptchaImageBuilder AddTipWidth(int width)
+        public CaptchaImageBuilder AddExtension(object value)
         {
-            Captcha.Value.TipWidth = width;
-            return this;
-        }
-        public CaptchaImageBuilder AddTipHeight(int height)
-        {
-            Captcha.Value.tipHeight = height;
+            Captcha.Value.Extension=value;
             return this;
         }
         public CaptchaImageBuilder AddCode(string code)

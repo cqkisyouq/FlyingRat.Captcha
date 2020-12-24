@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Copyright>Copyright 2020 (c) FlyingRat. All rights reserved.</Copyright>
+    <Description>This script for FlyingRat.Captcha</Description>
+    <PackageProjectUrl>https://github.com/cqkisyouq/FlyingRat.Captcha</PackageProjectUrl>
+    <PackageTags>JavaScript,FlyingRat.Captcha</PackageTags>
+    <Authors>FlyingRat</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<None Include="contentFiles\**" Pack="True" PackagePath="contentFiles\any\any\wwwroot\js" PackageCopyToOutput="true" />
+  </ItemGroup>
+</Project>

@@ -1,6 +1,7 @@
 ﻿using FlyingRat.Captcha.Builder;
 using FlyingRat.Captcha.Configuration;
 using FlyingRat.Captcha.Interface;
+using FlyingRat.Captcha.Model;
 using FlyingRat.Captcha.Validator;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
@@ -85,7 +86,7 @@ namespace FlyingRat.Captcha
                 .AddColumn(col).AddRow(row)
                 .AddType(Type).AddName(Name)
                 .AddTips("请依次点击")
-                .AddTipWidth(xpos).AddTipHeight(height)
+                .AddExtension(new PointExtension(height,xpos))
                 .AddPoints(points).AddOptions(option);
             return _captchaImageBuilder.Build();
         }

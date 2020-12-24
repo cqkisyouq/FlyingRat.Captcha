@@ -1,6 +1,7 @@
 ﻿using FlyingRat.Captcha.Configuration;
 using FlyingRat.Captcha.Context;
 using FlyingRat.Captcha.Interface;
+using FlyingRat.Captcha.Model;
 using FlyingRat.Captcha.Validator;
 using System;
 using System.Linq;

@@ -1,10 +1,10 @@
 ﻿using FlyingRat.Captcha.Configuration;
 using FlyingRat.Captcha.Interface;
+using FlyingRat.Captcha.Model;
 using FlyingRat.Captcha.Validator;
 using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FlyingRat.Captcha

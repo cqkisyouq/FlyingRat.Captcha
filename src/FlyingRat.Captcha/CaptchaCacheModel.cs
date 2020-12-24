@@ -1,9 +1,8 @@
 ﻿using FlyingRat.Captcha.Configuration;
+using FlyingRat.Captcha.Model;
 using FlyingRat.Captcha.Validator;
 using SixLabors.ImageSharp;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FlyingRat.Captcha
 {

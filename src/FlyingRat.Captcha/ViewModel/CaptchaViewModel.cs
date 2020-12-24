@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FlyingRat.Captcha.Model;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -25,5 +26,6 @@ namespace FlyingRat.Captcha.ViewModel
         public int th { get; set; }
         public string Name { get; set; }
         public CaptchaType Type { get; set; }
+        public object Extension { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using FlyingRat.Captcha.Configuration;
-using System;
+using FlyingRat.Captcha.Model;
 using System.Threading.Tasks;
 
 namespace FlyingRat.Captcha.Interface

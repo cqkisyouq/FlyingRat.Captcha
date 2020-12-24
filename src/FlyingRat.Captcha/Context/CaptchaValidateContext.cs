@@ -1,7 +1,5 @@
-﻿using FlyingRat.Captcha.Validator;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using FlyingRat.Captcha.Model;
+using FlyingRat.Captcha.Validator;
 
 namespace FlyingRat.Captcha.Context
 {

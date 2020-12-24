@@ -1,18 +1,15 @@
-﻿using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
+﻿using FlyingRat.Captcha.Model;
+using FlyingRat.Captcha.ViewModel;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Formats;
-using FlyingRat.Captcha.ViewModel;
+using System;
+using System.Text.Json;
 
 namespace FlyingRat.Captcha.Extensions
 {
-   public static class CaptchaImageExtension
+    public static class CaptchaImageExtension
     {
         /// <summary>
         /// html view model
@@ -25,6 +22,7 @@ namespace FlyingRat.Captcha.Extensions
         {
             if (captcha == null) return new CaptchaViewModel();
             var model = new CaptchaViewModel();
+            model.Extension = captcha.Extension;
             model.Index = JsonSerializer.Serialize(captcha.Index);
             model.Change = JsonSerializer.Serialize(captcha.Change);
             model.Width = captcha.Backgorund.Width;
@@ -34,8 +32,6 @@ namespace FlyingRat.Captcha.Extensions
             model.X = captcha.Points.Count;
             model.validate = validatePath;
             model.Tips = captcha.Tips;
-            model.tw = captcha.TipWidth;
-            model.th = captcha.tipHeight;
             if (imagePath != null)
             {
                 model.IsAction = true;
@@ -46,14 +42,10 @@ namespace FlyingRat.Captcha.Extensions
                 model.IsAction = false;
                 if (format == null) format = JpegFormat.Instance;
                 model.Gap = captcha.Gap?.ToBase64String(PngFormat.Instance);
-                model.BgGap = captcha.GapBackground?.ToBase64String(model.tw>0?PngFormat.Instance:format);
+                model.BgGap = captcha.GapBackground?.ToBase64String(model.Height!=captcha.GapBackground.Height?PngFormat.Instance:format);
                 if(hasBackground) model.Full = captcha.Backgorund?.ToBase64String(format);
             }
 
-            if (model.X == 1)
-            {
-                model.Y = captcha.Points.First().Y;
-            }
             model.Type = captcha.Type;
             model.Tk = captcha.Token;
             model.Name = captcha.Name;

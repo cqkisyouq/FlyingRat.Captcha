@@ -1,6 +1,7 @@
 ﻿using FlyingRat.Captcha.Builder;
 using FlyingRat.Captcha.Configuration;
 using FlyingRat.Captcha.Interface;
+using FlyingRat.Captcha.Model;
 using FlyingRat.Captcha.Validator;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
@@ -65,6 +66,7 @@ namespace FlyingRat.Captcha
                 .AddType(Type).AddName(Name)
                 .AddTips("向右拖动滑块填充拼图")
                 .AddPoints(new List<CaptchaPoint>(1) { point })
+                .AddExtension(new SliderExtension(point.Y))
                 .AddOptions(option);
             return _captchaImageBuilder.Build();
         }

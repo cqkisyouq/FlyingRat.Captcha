@@ -1,11 +1,9 @@
 ﻿using FlyingRat.Captcha.Configuration;
 using FlyingRat.Captcha.Validator;
 using SixLabors.ImageSharp;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace FlyingRat.Captcha
+namespace FlyingRat.Captcha.Model
 {
     public class CaptchaImage
     {
@@ -51,6 +49,7 @@ namespace FlyingRat.Captcha
         /// 
         /// </summary>
         public Image Gap { get; set; }
+        public object Extension { get; set; }
         public string Code { get; set; }
         public string Tips { get; set; }
         public int TipWidth { get; set; }

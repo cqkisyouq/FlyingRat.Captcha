@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Captcha", "test\captcha\Cap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "test\ConsoleApp1\ConsoleApp1.csproj", "{D8A5C6D8-DE39-4446-BBCD-3B38F62D4114}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlyingRat.Captcha.Scripts", "src\FlyingRat.Captcha.Scripts\FlyingRat.Captcha.Scripts.csproj", "{046073BB-0885-4D8D-94A3-EDCF5FCC58FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{D8A5C6D8-DE39-4446-BBCD-3B38F62D4114}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8A5C6D8-DE39-4446-BBCD-3B38F62D4114}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8A5C6D8-DE39-4446-BBCD-3B38F62D4114}.Release|Any CPU.Build.0 = Release|Any CPU
+		{046073BB-0885-4D8D-94A3-EDCF5FCC58FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{046073BB-0885-4D8D-94A3-EDCF5FCC58FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{046073BB-0885-4D8D-94A3-EDCF5FCC58FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{046073BB-0885-4D8D-94A3-EDCF5FCC58FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +45,7 @@ Global
 		{F1912635-0311-4AFF-905C-372712C2EAE5} = {1E3207FE-AEE8-4326-89B2-28D8DD489527}
 		{2A1247B8-9F78-499B-BC5E-6688EB2DFFE4} = {CCF8D502-F68A-478B-B969-6D51AA1DF92F}
 		{D8A5C6D8-DE39-4446-BBCD-3B38F62D4114} = {CCF8D502-F68A-478B-B969-6D51AA1DF92F}
+		{046073BB-0885-4D8D-94A3-EDCF5FCC58FA} = {1E3207FE-AEE8-4326-89B2-28D8DD489527}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9D05F52-A2D5-4DD3-995F-42A63F109D60}
