@@ -40,13 +40,17 @@ namespace FlyingRat.Captcha
             if (!validator.AllowValidate(context, options)) return context.GetResult().NotAllow();
 
             var handlers = _validateHandlerFactory?.Create(captcha);
-            handlers?.Handing(async (handler, context) =>await handler.Validating(context,options), context);
-            if (!validator.AllowValidate(context)) return context.GetResult().NotAllow();
-
+            if (handlers?.Any() ?? false)
+            {
+                handlers.Handing(async (handler, context) => await handler.Validating(context, options), context);
+                if (!context.GetResult().AllowValidate) return context.GetResult().NotAllow();
+            }
+           
             await validator.Validate(context,options);
             var result = context.GetResult();
             if (result.Token == null && result.Succeed) result.Token = _token.Create();
             if (!result.Succeed) result.Token = null;
+            if (result.AllowValidate) result.AllowValidate = validator.AllowValidate(context,options);
             handlers?.Reverse().Handing(async (handler, context) => await handler.Validated(context, options), context);
             return result;
         }
@@ -63,20 +67,20 @@ namespace FlyingRat.Captcha
             if (captcha == null) return default;
             var handlers = _validateHandlerFactory?.Create(type);
             CaptchaContext context = null;
-            if (handlers?.Any() ?? false)
+            var hasHandlers = handlers?.Any() ?? false;
+            if (hasHandlers)
             {
                 context = new CaptchaContext(options: options);
+                handlers.Handing(async (handler, context) => await handler.Creating(context), context);
             }
-
-            handlers?.Handing(async (handler, context) => await handler.Creating(context), context);
             var model = await captcha.Captcha(options);
             if (model.Token == null) model.Token = _token.Create();
             if(model.Options==null) model.Options = options?.Clone() as BaseCaptchaOptions;
-            if (handlers?.Any() ?? false)
+            if (hasHandlers)
             {
                 context.Captcha = model;
+                handlers.Reverse().Handing(async (handler, context) => await handler.Created(context), context);
             }
-             handlers?.Reverse().Handing(async (handler, context) => await handler.Created(context), context);
             return model;
         }
     }

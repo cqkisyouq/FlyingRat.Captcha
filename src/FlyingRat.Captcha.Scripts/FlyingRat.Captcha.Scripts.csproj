@@ -5,14 +5,26 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>Copyright 2020 (c) FlyingRat. All rights reserved.</Copyright>
-    <Description>This script for FlyingRat.Captcha</Description>
+    <Description>This script for FlyingRat.Captcha.slider rotate setting</Description>
     <PackageProjectUrl>https://github.com/cqkisyouq/FlyingRat.Captcha</PackageProjectUrl>
     <PackageTags>JavaScript,FlyingRat.Captcha</PackageTags>
     <Authors>FlyingRat</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
 	<None Include="contentFiles\**" Pack="True" PackagePath="contentFiles\any\any\wwwroot\js" PackageCopyToOutput="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="contentFiles\flyingrat\js\flyingrat.captcha.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="contentFiles\flyingrat\js\flyingrat.captcha.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 </Project>

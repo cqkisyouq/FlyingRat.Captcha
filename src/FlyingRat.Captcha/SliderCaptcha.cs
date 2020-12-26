@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,17 +43,46 @@ namespace FlyingRat.Captcha
             var option = options ?? _options;
             int col = option.Col;
             int row = option.Row;
+            int rotate =rd.Next(0,2);
             var point = RandPoint(image, alpha);
             _driver.CopyNoAlpha(image, new Point(point.X, point.Y), alpha);
-
             alpha.Mutate(x =>
             {
                 x.DrawImage(border, 1);
+                if(rotate>0)
+                {
+                    rotate = rd.Next(0, 2);
+                    x.RotateFlip(RotateMode.Rotate180, rotate==1?FlipMode.Horizontal:FlipMode.Vertical);
+                    rotate = rotate == 0 ? 180 : -180;
+                }
             });
-
             image.Mutate(x =>
             {
-                x.DrawImage(slider,new Point(point.X,point.Y), 1);
+                x.DrawImage(slider, new Point(point.X, point.Y), 1);
+                if (option?.Safelevel != SafelevelEnum.None)
+                {
+                    var level = (int)option.Safelevel + 1;
+                    for (int i = 0; i < level; i++)
+                    {
+                        using var safe = slider.Clone();
+                        var rePoint = RandPoint(image, slider);
+                        if ((i & 1) == 1) rePoint.Y = point.Y;
+                        var xpos = Math.Abs(point.X - rePoint.X);
+                        var ypost = Math.Abs(point.Y - rePoint.Y);
+                        if (xpos <= (slider.Width >> 1))
+                        {
+                            xpos = rd.Next(slider.Width-xpos, slider.Width);
+                            rePoint.X += (i & 1) == 1 ? -xpos : xpos;
+                        }
+                        if (ypost <= (slider.Height >> 1))
+                        {
+                            ypost = rd.Next(0, slider.Height>>1);
+                            rePoint.Y += (i & 1) == 1 ? ypost : -ypost;
+                        }
+                        safe.Mutate(x => x.Rotate(rd.Next(30, 60)));
+                        x.DrawImage(safe, rePoint.Point, 0.7f);
+                    }
+                }
             });
 
             var randData = _driver.RandImagesBy(image, ref col, ref row);
@@ -66,7 +96,7 @@ namespace FlyingRat.Captcha
                 .AddType(Type).AddName(Name)
                 .AddTips("向右拖动滑块填充拼图")
                 .AddPoints(new List<CaptchaPoint>(1) { point })
-                .AddExtension(new SliderExtension(point.Y))
+                .AddExtension(new SliderExtension(point.Y, rotate))
                 .AddOptions(option);
             return _captchaImageBuilder.Build();
         }

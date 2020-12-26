@@ -151,8 +151,10 @@
             span.innerText = method.data.tips;
             method.updateTips(span, true);
             method.icon.show(method.options.icon.refresh);
-            let slider = func.options.slider, gapImg = func.options.sliderImg;
+            let slider = func.options.slider, gapImg = func.options.sliderImg, rotate = method.data.extension.rotate;
             controlX = 0; isMove = false;
+            gapImg.style.transform = "";
+            if (rotate) gapImg.style.transform = (rotate>0 ? "rotateY(" : "rotateX(") + rotate + "deg)";
             gapImg.src = method.data.isAction ? method.data.gap + "?tk=" + method.data.tk : method.data.gap;
             gapImg.style.top = getNumberPx(method.data.extension.y);
             gapImg.style.display = "block";
@@ -315,16 +317,18 @@
         function clickPoint(event) {
             let x = event.layerX, y = event.layerY;
             if (method.validatePoint(x, y)) {
-                let index = method.points.length + 1;
+                let isReindex = method.maxPoint != 1;
+                let index = isReindex?method.points.length+1:method.points.length;
                 let max = method.maxPoint;
                 drawPoint(x, y, index, function (div, index) {
-                    if (max == index - 1 && method.autoValidate) return;
+                    let reIndex = isReindex ? index - 1 : index;
+                    if (max == reIndex && method.autoValidate) return;
                     div.style.top = getNumberPx(y - div.clientHeight);
                     div.style.left = getNumberPx(x - (div.clientWidth >> 1));
                     div.onclick = function (event) {
                         if (method.verifying && method.autoValidate) return;
-                        method.clearPoints(index - 1);
-                        clearIcons(index - 1);
+                        method.clearPoints(reIndex);
+                        clearIcons(reIndex);
                         event.stopPropagation();
                     }
                 })
@@ -434,7 +438,6 @@
                 "createTool": { get: function () { return createTool; } },
                 "updateTool": { get: function () { return updateTool; } },
                 "drawCaptcha": { get: function () { return drawImage; } },
-                "drawPoint": { get: function () { return drawPoint; } },
                 "refresh": { get: function () { return autoDrawImage; } },
                 "destroy": { get: function () { return destroy; } },
                 "destroyCurrent": { get: function () { return destoryCaptcha; } },

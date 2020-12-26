@@ -65,9 +65,9 @@
     <None Include="wwwroot\flyingrat\image\background\背景7.jpg" />
     <None Include="wwwroot\flyingrat\image\background\背景8.jpg" />
     <None Include="wwwroot\flyingrat\image\background\背景9.jpg" />
-    <None Include="wwwroot\flyingrat\image\lump\b1_方形.png" />
-    <None Include="wwwroot\flyingrat\image\lump\b2_星形.png" />
-    <None Include="wwwroot\flyingrat\image\lump\b3_圆形.png" />
+    <None Include="wwwroot\flyingrat\image\lump\1\b1_方形.png" />
+    <None Include="wwwroot\flyingrat\image\lump\1\b2_星形.png" />
+    <None Include="wwwroot\flyingrat\image\lump\1\b3_圆形.png" />
     <None Include="wwwroot\flyingrat\image\sliders\1\alpha.png" />
     <None Include="wwwroot\flyingrat\image\sliders\1\border.png" />
     <None Include="wwwroot\flyingrat\image\sliders\1\image.png" />

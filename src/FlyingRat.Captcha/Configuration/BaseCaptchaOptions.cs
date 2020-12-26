@@ -25,11 +25,19 @@ namespace FlyingRat.Captcha.Configuration
         /// <summary>
         /// 最大验证次数
         /// </summary>
-        public int Validate_Max { get; set; } = 3;
+        public virtual int Validate_Max { get; set; } = 3;
+        public virtual SafelevelEnum Safelevel { get; set; } = SafelevelEnum.Middle;
 
         public virtual object Clone()
         {
             return this.MemberwiseClone();
         }
+    }
+    public  enum SafelevelEnum
+    {
+        None,
+        Low,
+        Middle,
+        Hight
     }
 }

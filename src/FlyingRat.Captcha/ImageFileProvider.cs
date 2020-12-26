@@ -15,11 +15,13 @@ namespace FlyingRat.Captcha
     {
         private Random Random { get; } = new Random(DateTime.Now.Millisecond);
         private readonly string[] SliderPath;
+        private readonly string[] LumpPath;
         public CaptchaImageOptions _imageOptions { get; set; }
         public ImageFileProvider(IOptions<CaptchaImageOptions> options)
         {
             _imageOptions = options.Value;
             SliderPath = FindDirectorys(_imageOptions.Slider_Path);
+            LumpPath = FindDirectorys(_imageOptions.Lump_Path);
         }
         public string SliderRoot
         {
@@ -33,7 +35,8 @@ namespace FlyingRat.Captcha
         {
             get
             {
-                return _imageOptions.Lump_Path;
+                var index = Random.Next(0, LumpPath.Length);
+                return LumpPath[index];
             }
         }
         public string[] LoadFilesPath(string directory)
@@ -97,7 +100,8 @@ namespace FlyingRat.Captcha
 
         private string[] FindFiles(string dir)
         {
-            var str_Path = Path.Combine(_imageOptions.Root, dir);
+            dir=dir.Replace('\\', Path.AltDirectorySeparatorChar);
+            var str_Path =dir.StartsWith(_imageOptions.Root)?dir:Path.Combine(_imageOptions.Root, dir);
             //Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dir);
             if (Directory.Exists(str_Path))
             {
@@ -116,7 +120,7 @@ namespace FlyingRat.Captcha
         /// <returns></returns>
         private string[] FindDirectorys(string dir)
         {
-            var str_Path = Path.Combine(_imageOptions.Root, dir);
+            var str_Path = Path.Combine(_imageOptions.Root, dir).Replace('\\',Path.AltDirectorySeparatorChar);
             //Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dir);
             if (Directory.Exists(str_Path))
             {

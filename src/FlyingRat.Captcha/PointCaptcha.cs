@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -45,6 +46,7 @@ namespace FlyingRat.Captcha
             int col = option.Col;
             int row = option.Row;
             var lumps = await _imageProvider.LoadRandImages(_imageProvider.LumpRoot);
+            var count = Math.Min((int)option.Safelevel +1, lumps.Count);
             var points = new List<CaptchaPoint>(lumps.Count);
             var rdPoints = RandPoints(image, lumps.ToArray());
             image.Mutate(x =>
@@ -72,10 +74,11 @@ namespace FlyingRat.Captcha
             {
                 for (int i = 0; i < lumps.Count; i++)
                 {
-                    var lump = lumps[i];
+                    using var lump = lumps[i].Clone();
                     lump.Mutate(x => x.Invert());
                     x.DrawImage(lump, new Point(xpos, ypos), 1);
                     xpos += lump.Width + 5;
+                    lumps[i].Dispose();
                 }
             });
             _captchaImageBuilder.AddBackground(fullImage)
@@ -86,7 +89,7 @@ namespace FlyingRat.Captcha
                 .AddColumn(col).AddRow(row)
                 .AddType(Type).AddName(Name)
                 .AddTips("请依次点击")
-                .AddExtension(new PointExtension(height,xpos))
+                .AddExtension(new PointExtension(height, xpos))
                 .AddPoints(points).AddOptions(option);
             return _captchaImageBuilder.Build();
         }
