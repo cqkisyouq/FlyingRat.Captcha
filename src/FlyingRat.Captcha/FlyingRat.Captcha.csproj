@@ -3,12 +3,12 @@
   <PropertyGroup>
 	<TargetFramework>netstandard2.1</TargetFramework>
 	<Copyright>Copyright 2020 (c) FlyingRat. All rights reserved.</Copyright>
-	<Description>Increase security handling,Change load lump directory. FlyingRat.Captcha.Scripts version &gt;= 1.0.1</Description>
+	<Description>All lowercase file names,Ensure the normal operation of Linux. FlyingRat.Captcha.Scripts version &gt;= 1.0.1</Description>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<PackageProjectUrl>https://github.com/cqkisyouq/FlyingRat.Captcha</PackageProjectUrl>
-	<Version>1.0.3</Version>
-	<AssemblyVersion>1.0.1.0</AssemblyVersion>
-	<FileVersion>1.0.1.0</FileVersion>
+	<Version>1.0.4</Version>
+	<AssemblyVersion>1.0.2.0</AssemblyVersion>
+	<FileVersion>1.0.2.0</FileVersion>
 	<PackageTags>FlyingRat</PackageTags>
 	<Authors>FlyingRat</Authors>
 	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
